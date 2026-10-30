@@ -34,10 +34,11 @@ export function ReplayLab() {
         <ReplayTimeline status={status} />
       </Panel>
       {status && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <Stat label="Pipeline throughput" value={status.inference_flows_per_second ? fmt(status.inference_flows_per_second) : "–"} hint="Flows/s of scoring, before release pacing" />
           <Stat label="Campaign hypotheses" value={fmt(status.campaigns)} hint={`${status.campaign_mode} mode`} />
           <Stat label="Investigation triggers" value={fmt(status.investigation_triggers)} hint={`${fmt(status.investigations)} investigated (budget 5 per batch)`} />
+          <Stat label="Agent 5 policies" value={status.defense_available ? `${fmt(status.active_policies)} active` : "Off"} hint={status.defense_available ? `${fmt(status.policies_activated)} activated, ${fmt(status.counts.defense.BLOCK)} flows blocked, ${fmt(status.correlation_groups)} Agent 4 groups` : "No source addresses in this input"} />
           <Stat label="Decisions" value={<span className="text-base">{fmt(status.counts.decisions.ALLOW)} / {fmt(status.counts.decisions.BLOCK)} / {fmt(status.counts.decisions.REVIEW)}</span>} hint="Allow / block / review" />
         </div>
       )}
@@ -46,6 +47,18 @@ export function ReplayLab() {
         <div className="space-y-3">
           <Panel title="Final class so far">
             <BarList total={Math.max(status?.counts.total ?? 0, 1)} items={CLASSES.map((c) => ({ label: c, value: status?.counts.classes[c] ?? 0, color: CLASS_COLOR[c] }))} />
+          </Panel>
+          <Panel title="Agent 5 policy activations">
+            {stream.policies.length ? (
+              <ul className="space-y-2 max-h-52 overflow-y-auto text-xs">
+                {stream.policies.map((p) => (
+                  <li key={p.seq}>
+                    <span className="font-medium num">{p.policy.policy_id}</span> blocks later flows from <span className="num">{p.policy.scope_value}</span>
+                    <p className="text-text-3 mt-0.5">After {p.policy.activated_after_record_id}, for {fmt(p.policy.ttl_records)} records. Group {p.policy.group_id}.</p>
+                  </li>
+                ))}
+              </ul>
+            ) : <Empty title={status?.defense_available === false ? "Needs source addresses" : "None yet"}>{status?.defense_available === false && "This input has no source_ip, so Agents 4 and 5 are off."}</Empty>}
           </Panel>
           <Panel title="Campaign detections">
             {stream.campaigns.length ? (

@@ -54,3 +54,39 @@ def test_outputs_match_contracts_and_carry_references():
     PolicyOutcome(**policy)
     assert policy["policy_rule"] == rule and "investigation:INV-F1" in policy["evidence_refs"]
     assert "0.970" in policy["decision_reason"]
+
+
+def test_the_briefs_five_evidence_conditions():
+    assert run("BENIGN", 0.99, 0.10)[0].evidence_status[0] == "AGREED_BENIGN"
+    assert run("DOS", 0.99, 0.99)[0].evidence_status[0] == "MULTI_SIGNAL_ATTACK"
+    assert run("DOS", 0.99, 0.10)[0].evidence_status[0] == "CLASSIFIER_ONLY"
+    assert run("BENIGN", 0.99, 0.99)[0].evidence_status[0] == "ANOMALY_ONLY"
+    assert run("DOS", 0.40, 0.99)[0].evidence_status[0] == "UNCERTAIN"
+    assert run("BENIGN", 0.40, 0.10)[0].evidence_status[0] == "UNCERTAIN"
+
+
+def test_anomaly_never_overwrites_the_classifier_class():
+    fused, decision, _ = run("BENIGN", 0.99, 0.99)
+    assert fused.final_class[0] == "BENIGN" and fused.agreement[0] == "DISAGREE" and decision == "REVIEW"
+
+
+def test_campaign_evidence_is_not_reported_as_agent2_support():
+    fused, decision, _ = run("DOS", 0.95, 0.10, campaign=True)
+    assert fused.evidence_status[0] == "CAMPAIGN_CORROBORATED" and fused.agreement[0] == "DISAGREE"
+    assert decision == "BLOCK"
+    assert run("DOS", 0.95, 0.99, campaign=True)[0].evidence_status[0] == "MULTI_SIGNAL_ATTACK"
+    assert run("BENIGN", 0.99, 0.10, campaign=True)[0].evidence_status[0] == "CAMPAIGN_ONLY"
+    assert run("BENIGN", 0.99, 0.99, campaign=True)[0].evidence_status[0] == "ANOMALY_ONLY"
+
+
+def test_uncertain_attack_is_never_blocked():
+    assert run("DOS", 0.40, 0.99)[1] == "REVIEW"
+
+
+def test_output_reports_confidence_status_and_evidence_references():
+    fused, _, _ = run("DOS", 0.40, 0.99)
+    out = fusion_output(fused, 0, "S1", [{"feature": "F", "measured_value": 1.0, "benign_median": 0.0, "robust_z": 9}],
+                        campaign_type="DOS_CANDIDATE", campaign_id="CMP-1")
+    assert out["confidence_status"] == "LOW_CONFIDENCE"
+    assert {"flow:S1", "feature:F", "campaign:CMP-1"} <= set(out["evidence_refs"])
+

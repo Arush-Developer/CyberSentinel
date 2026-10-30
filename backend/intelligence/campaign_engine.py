@@ -20,6 +20,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from backend.preprocessing.data_processor import replay_order
+
 PORT = "Destination Port"
 PACKET_RATE = "Flow Packets/s"
 BYTE_RATE = "Flow Bytes/s"
@@ -132,16 +134,6 @@ def detect_mode(metadata: pd.DataFrame, features: pd.DataFrame) -> tuple[str, li
             "record order stands in for time and is not verified chronology",
         ]
     return "disabled", ["neither endpoint metadata nor Destination Port is available"]
-
-
-def _ordering(metadata: pd.DataFrame) -> np.ndarray:
-    if "timestamp" in metadata:
-        ts = pd.to_datetime(metadata["timestamp"], errors="coerce")
-        return np.argsort(ts.to_numpy(), kind="stable")
-    if "seq" in metadata:
-        return np.argsort(pd.to_numeric(metadata["seq"]).to_numpy(), kind="stable")
-    numeric = metadata["flow_id"].astype(str).str.extract(r"(\d+)")[0].astype(np.int64)
-    return np.argsort(numeric.to_numpy(), kind="stable")
 
 
 def _window_ids(metadata: pd.DataFrame, order: np.ndarray, config: CampaignConfig) -> np.ndarray:
@@ -361,7 +353,7 @@ class CampaignEngine:
         flow_campaign = np.full(len(metadata), None, dtype=object)
         if mode == "disabled" or len(metadata) == 0:
             return CampaignResult(mode, limitations, [], flow_campaign)
-        order = _ordering(metadata)
+        order = replay_order(metadata)
         windows = _window_ids(metadata, order, self.config)
         tracker = CampaignTracker(mode, self.config)
         frame = self.prepare(metadata, features, is_anomaly).iloc[order]

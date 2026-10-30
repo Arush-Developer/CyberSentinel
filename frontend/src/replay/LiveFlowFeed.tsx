@@ -9,7 +9,7 @@ export function LiveFlowFeed({ flows }: { flows: ReplayFlowEvent[] }) {
         <TableWrap>
           <div className="max-h-[520px] overflow-y-auto">
             <table className="w-full text-xs num">
-              <thead className="sticky top-0 bg-ink-850"><tr>{["Flow", "Agent 1", "Conf.", "Anomaly", "Agents", "Final", "Evidence", "Decision", "Label"].map((h) => <th key={h} className={thCls}>{h}</th>)}</tr></thead>
+              <thead className="sticky top-0 bg-ink-850"><tr>{["Flow", "Agent 1", "Conf.", "Anomaly", "Agents", "Final", "Evidence", "Decision", "Agent 5", "Label"].map((h) => <th key={h} className={thCls}>{h}</th>)}</tr></thead>
               <tbody>
                 {flows.map((f) => (
                   <tr key={f.flow_id} className={f.investigation_triggered ? "bg-warn/[0.04]" : ""}>
@@ -21,6 +21,7 @@ export function LiveFlowFeed({ flows }: { flows: ReplayFlowEvent[] }) {
                     <td className={tdCls}><ClassTag name={f.final_class} /></td>
                     <td className={`${tdCls} text-text-2`}>{f.evidence_status}</td>
                     <td className={tdCls}><DecisionBadge decision={f.policy_decision} /></td>
+                    <td className={tdCls}>{f.defense_action === "BLOCK" ? <span className="text-crit" title="Blocked by an earlier active policy">{f.applied_policy_id}</span> : f.defense_action ? <span className="text-text-3">allow</span> : <span className="text-text-3" title="This input has no source addresses">n/a</span>}</td>
                     <td className={`${tdCls} text-text-3`}>{f.ground_truth_evaluation_only}</td>
                   </tr>
                 ))}

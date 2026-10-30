@@ -27,3 +27,25 @@ labels:
     DOS: DOS
     DDOS: DDOS
     PORT_SCAN: PORT_SCAN
+
+# Level 2: Agents 4 and 5, and the three hidden-set CSVs. No endpoint data exists in the participant
+# pack, so these values are engineering defaults, not tuned results. Revisit once the hidden set's
+# metadata can be inspected, without using any labels. Rehearsal: scripts/rehearse_level2.py.
+level2:
+  temporal:
+    window_records: 2000
+    scan_min_ports: 20
+    converging_min_sources: 10
+  defense:
+    min_confidence: 0.90
+    min_attack_flows_multi_signal: 3
+    min_attack_flows_classifier_only: 5
+    min_attack_flows_converging: 1
+    min_attack_share: 0.60
+    ttl_records: 2000
+    max_ttl_records: 16000
+  # The brief writes "anomaly score" and "evidence status", and its replay.csv row repeats the policy.csv
+  # columns while its text names action and applied_policy_id. Confirm these against the organisers' API.
+  columns:
+    classification: {record_id: record_id, predicted_class: predicted_class, anomaly_score: anomaly_score, evidence_status: evidence_status}
+    replay: {record_id: record_id, action: action, applied_policy_id: applied_policy_id}

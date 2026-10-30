@@ -69,3 +69,17 @@ def test_metrics_come_from_saved_reports(client):
     metrics = client.get("/api/metrics").json()
     assert metrics["evaluation_report"]["system"]["rows"] == 114185
     assert metrics["training_report"]["eval_partition_used"] is False
+
+
+def test_defense_is_honest_about_missing_endpoints(client):
+    body = client.get("/api/defense").json()
+    assert body["available"] is False and "source_ip" in body["unavailable_reason"] and not body["policies"]
+    assert client.get("/api/models/status").json()["defense_available"] is False
+
+
+def test_agent3_output_carries_confidence_status_and_references(client):
+    item = client.get("/api/flows", params={"scope": "historical", "limit": 1}).json()["items"][0]
+    fusion = client.get(f"/api/flows/{item['flow_id']}").json()["fusion"]
+    assert fusion["confidence_status"] in ("CONFIDENT", "LOW_CONFIDENCE")
+    assert f"flow:{item['flow_id']}" in fusion["evidence_refs"]
+

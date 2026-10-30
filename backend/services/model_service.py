@@ -64,6 +64,10 @@ class Pipeline:
                    load_fusion_config(), PolicyThresholds.calibrated(),
                    CampaignEngine(CampaignConfig.load(resolve(CAMPAIGN_CONFIG_PATH))))
 
+    def fuse_level1(self, proba: np.ndarray, scores: np.ndarray) -> FusionResult:
+        """Agents 1-3 alone, with no cross-flow evidence. This is what classification.csv reports."""
+        return self.fuse(proba, scores)
+
     def score(self, features: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
         return self.threat.predict_proba(features), self.anomaly.score(features)
 

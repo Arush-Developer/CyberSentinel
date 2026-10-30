@@ -9,7 +9,8 @@ from backend.schemas import contracts
 TYPES = (ROOT / "frontend/src/services/types.ts").read_text()
 SHARED = ["ThreatAssessment", "SupportingFeature", "AnomalyAssessment", "CampaignRelationship", "CampaignRecord",
           "ToolResult", "ToolCall", "InvestigationResult", "FusionAssessment", "PolicyOutcome", "FlowDetail",
-          "Thresholds", "ReplayStatus", "ModelStatusResponse"]
+          "Thresholds", "ReplayStatus", "ModelStatusResponse", "CorrelationEvidence", "CorrelationGroup",
+          "DefensePolicy", "DefenseState", "FlowDefense"]
 TS_NAME = {"ModelStatusResponse": "ModelStatus"}
 
 

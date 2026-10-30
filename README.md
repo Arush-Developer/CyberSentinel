@@ -1,8 +1,8 @@
 # CyberSentinel X
 
-JAI 2026, Track 1: Agentic AI for Cybersecurity. A multi-agent system that classifies network flows,
-scores them for anomalies independently, looks for patterns across flows, investigates suspicious
-ones with real tools, and makes explainable **simulated** ALLOW / BLOCK / REVIEW decisions.
+JAI 2026, Track 1: Agentic AI for Cybersecurity. A five-agent system that classifies network flows,
+scores them for anomalies independently, correlates suspicious flows over time, investigates them with
+real tools, and makes explainable **simulated** decisions, including temporary source-address policies.
 
 This is an offline replay of the organisers' CICIDS2017 pack. It never touches a live network or firewall.
 
@@ -34,6 +34,10 @@ full detail is in `data/reports/evaluation_report.json`.
 
 **Agent agreement:** 76.4%. Most disagreement is Agent 1 calling brute force or port scans that Agent 2 finds normal.
 
+**Agent 3 evidence status, Agents 1 to 3 only:** AGREED_BENIGN 57,000; MULTI_SIGNAL_ATTACK 30,290; CLASSIFIER_ONLY 23,893; ANOMALY_ONLY 3,001; UNCERTAIN 1.
+
+**Agents 4 and 5 have no measured result on real endpoints,** because the pack has none. See [Known limitations](#known-limitations).
+
 ### How to read these numbers
 
 - **The classifier score reflects this capture, not networks in general.** Each attack class here has
@@ -54,6 +58,7 @@ full detail is in `data/reports/evaluation_report.json`.
 
   Their value here is explanation and a second opinion rather than better scores. They may matter more
   on traffic the classifier has not seen, but that has not been measured.
+- **Replay looks only backwards, and it barely changes the outcome.** Running the complete system as a forward-only replay gives the same macro-F1 and the same 54,141 blocks as the batch run, with 31 more flows sent to review. Modes A, B and C are in `evaluation_modes` in the report.
 
 ## Technology stack
 
@@ -108,10 +113,25 @@ Start a replay from the Replay Lab screen, where you can also pause, resume and 
 curl -X POST localhost:8000/api/replay/start -H 'Content-Type: application/json' -d '{"speed": 2000}'
 ```
 
-Score the hidden set when it is released (no submission is made):
+Run the browser tests in your installed Chrome. They start their own backend and frontend on other ports. The second command also exercises Agents 4 and 5, on a file made by `./scripts/run_all.sh` or `scripts/rehearse_level2.py`:
 
 ```bash
-.venv/bin/python scripts/score_records.py --input PATH/TO/hidden.parquet --output data/processed/hidden_predictions.parquet
+npm --prefix frontend run test:e2e
+```
+```bash
+E2E_REPLAY_INPUT="$PWD/data/processed/rehearsal/flows.parquet" npm --prefix frontend run test:e2e
+```
+
+When the hidden set is released, write the three Level 2 files. This uploads nothing, and fails if the files break the brief's rules:
+
+```bash
+.venv/bin/python scripts/run_level2.py --input PATH/TO/hidden.parquet --out-dir data/processed/level2
+```
+
+Show that run on the website:
+
+```bash
+CYBERSENTINEL_REPLAY_INPUT=PATH/TO/hidden.parquet .venv/bin/uvicorn backend.main:app --port 8000
 ```
 
 ## How it works
@@ -126,6 +146,10 @@ The layout and who owns each module are in [docs/TEAM_OWNERSHIP.md](docs/TEAM_OW
  flow order and ─► Campaign engine: cross-flow hypotheses ─┤     rationale
  metadata                                                  │
  triggers ───────► Investigation: bounded tool calls ──────┘
+
+ At each record, in order, with source and destination addresses:
+   1. Agent 5 applies policies already active. A match is BLOCKED and not analysed.
+   2. Otherwise ALLOW. Agent 4 adds the flow to its groups, and Agent 5 may activate a policy for LATER flows.
 ```
 
 - **Agent 1** ([threat_agent.py](backend/agents/threat_agent.py)): best of four candidates on an internal
@@ -134,11 +158,17 @@ The layout and who owns each module are in [docs/TEAM_OWNERSHIP.md](docs/TEAM_OW
   its own preprocessing. Its score is a percentile among held-out benign flows, **not a probability**.
 - **Agent 3** ([fusion_agent.py](backend/agents/fusion_agent.py)): keeps evidence types separate instead
   of averaging them, and returns `final_class`, `evidence_status` and a rationale built from measured values.
+- **Agent 4** ([temporal_agent.py](backend/agents/temporal_agent.py)): groups suspicious flows by source, and
+  by destination when several sources converge, inside a sliding window of records it has already seen.
+- **Agent 5** ([defense_agent.py](backend/agents/defense_agent.py)): temporary simulated `SOURCE_IP` policies, based
+  on repeated attack calls, Agent 2 support and attack share. Repeat offenders get longer policies.
 - **Campaign engine** ([campaign_engine.py](backend/intelligence/campaign_engine.py)): never reads labels or Agent 1's output.
 - **Investigation** ([investigation_orchestrator.py](backend/agents/investigation_orchestrator.py)):
   deterministic planner, eight registered tools, at most three actions per flow, with timeouts, cancellation and audit logging. No LLM is used.
 - **Policy** ([policy_engine.py](backend/policy/policy_engine.py)): configurable thresholds and a what-if mode.
-- **Replay** ([replay_engine.py](backend/replay/replay_engine.py)): real records and real batch inference, with a global stop.
+- **Replay** ([replay_engine.py](backend/replay/replay_engine.py)): real records in the supplied order and real batch
+  inference, with a global stop. Its tools cannot see later records.
+- **Audit** ([audit.py](backend/investigation/audit.py)): every tool call, control action and policy change, saved to SQLite.
 
 ## Key data decisions
 
@@ -156,21 +186,27 @@ The layout and who owns each module are in [docs/TEAM_OWNERSHIP.md](docs/TEAM_OW
 
 - **No endpoint metadata in this pack.** IPs, source port, protocol and sequence ship only with the hidden
   set. On this data the campaign engine runs in `cohort` mode: no source attribution, DoS and DDoS merged
-  as `VOLUMETRIC_CANDIDATE`, and record order standing in for time. **Endpoint-mode detectors have only
-  been tested on synthetic fixtures**, and their thresholds may need adjusting on real hidden data.
+  as `VOLUMETRIC_CANDIDATE`, and record order standing in for time. Agents 4 and 5 are off.
+- **Agents 4 and 5, and endpoint-mode campaigns, are unmeasured on real endpoints.** They were tested on real
+  flows with invented addresses. `data/reports/level2_rehearsal.json` proves the mechanism and the file rules. It
+  does not predict the hidden-set score, and their thresholds are engineering defaults, not tuned values.
 - **Level 1 submission is not done.** The API details are in the event WhatsApp group, not in this
   repository. See [docs/LEVEL1_SUMMARY.md](docs/LEVEL1_SUMMARY.md).
+- **Level 2 upload is not built.** No API details exist yet. The `replay.csv` columns and two column spellings are
+  inferred from an inconsistent table in the brief: see [docs/MODULE_CONTRACTS.md](docs/MODULE_CONTRACTS.md#level-2-files).
 - **Agent 2 barely sees brute force or port scans,** so many of those decisions rest on the classifier alone or on campaign context.
 - **Benign review load is 13.3%** with campaigns on, mostly benign flows that share a port and window with an attack.
-- **Replay investigations** use the whole-set campaign record for context, so a campaign's flow count can include later windows. Investigations are capped at 5 per replay batch by default.
+- **Replay investigations** are capped at 5 per batch by default, so most triggered flows are not investigated in a live replay. The batch evaluation investigates all of them.
+- **Replay campaigns** are assessed per batch, so a flow's campaign can depend on later flows in its own batch. Agents 4 and 5 do not read campaigns; they work record by record.
 - **`POST /api/flows/analyse`** assesses one flow with no cross-flow context.
-- **Audit log and policy history** are held in memory and reset when the backend restarts. Replay position and results are saved.
+- **A replay of a separately supplied file** (`CYBERSENTINEL_REPLAY_INPUT`) is not saved across restarts, so it can't overwrite the official run. Its audit log is also held in memory.
 
 ## Disclosure
 
 - **AI assistance:** this codebase was generated with Claude Code (Anthropic) from the team's engineering brief. Each team member must still review, test and understand their modules: see [docs/TEAM_HANDOFF.md](docs/TEAM_HANDOFF.md).
 - **Data:** organiser-provided CICIDS2017 pack only. Unit tests use synthetic fixtures, labelled as such.
-- **Third-party components:** scikit-learn, CatBoost, pandas, NumPy, PyArrow, FastAPI, Uvicorn, Pydantic, React, Vite, Tailwind CSS, Recharts, React Flow (`@xyflow/react`), Lucide.
+- **Third-party components:** scikit-learn, CatBoost, pandas, NumPy, PyArrow, FastAPI, Uvicorn, Pydantic, React, Vite, Tailwind CSS, Recharts, React Flow (`@xyflow/react`), Lucide, Playwright (tests only).
+- **Synthetic data:** `scripts/rehearse_level2.py` and its tests attach invented addresses to real eval flows, and are labelled as such. No mock or hard-coded prediction is used anywhere.
 - **Credentials:** none are stored. The submission adapter reads any token from an environment variable.
 
 ## Documentation
@@ -181,5 +217,7 @@ The layout and who owns each module are in [docs/TEAM_OWNERSHIP.md](docs/TEAM_OW
 - [Module contracts](docs/MODULE_CONTRACTS.md)
 - [Integration guide](docs/INTEGRATION_GUIDE.md)
 - [Implementation status](docs/IMPLEMENTATION_STATUS.md)
-- [Refactor audit](docs/REFACTOR_AUDIT.md)
+- [Codebase audit](docs/CODEBASE_AUDIT.md)
+- [Git workflow](docs/GIT_WORKFLOW.md)
+- [Refactor audit, historic](docs/REFACTOR_AUDIT.md)
 - [Level 1 summary](docs/LEVEL1_SUMMARY.md)

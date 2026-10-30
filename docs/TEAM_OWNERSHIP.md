@@ -15,10 +15,12 @@ This records who is responsible for each module, not who wrote it. The first ver
 | `backend/intelligence/evidence_engine.py` | Evidence graph |
 | `backend/investigation/audit.py` | Audit log |
 | `backend/policy/policy_engine.py` | Simulated decisions, what-if |
+| `backend/agents/defense_agent.py` | Agent 5 and the per-record defence loop |
+| `backend/services/level2.py`, `scripts/run_level2.py`, `scripts/rehearse_level2.py` | Level 2 CSVs, rule checker, rehearsal |
 | `backend/replay/replay_engine.py` | Replay |
 | `backend/schemas/contracts.py` | Shared contracts, coordinated with everyone |
 | `scripts/calibrate_fusion.py`, `scripts/score_records.py`, `scripts/run_all.sh` | Thresholds, scoring, full rebuild |
-| `tests/agents/test_fusion.py`, `tests/policy/`, `tests/replay/`, `tests/api/`, `tests/integration/` | Backend and end-to-end tests |
+| `tests/agents/test_fusion.py`, `tests/agents/test_temporal_defense.py`, `tests/policy/`, `tests/replay/`, `tests/api/`, `tests/integration/`, `tests/test_imports.py` | Backend and end-to-end tests |
 
 - **Inputs:** Agent 1 and 2 outputs, campaign results, tool results, HTTP requests.
 - **Outputs:** `FusionAssessment`, `PolicyOutcome`, `InvestigationResult`, the REST and SSE API.
@@ -33,7 +35,7 @@ This records who is responsible for each module, not who wrote it. The first ver
 | `backend/evaluation/metrics.py` | Metrics |
 | `models/threat_model/` | Threat model artifact |
 | `scripts/profile_dataset.py`, `scripts/train_models.py`, `scripts/leakage_audit.py`, `scripts/evaluate.py` | Profiling, training, audit, evaluation |
-| `tests/agents/test_preprocessing.py`, threat tests in `tests/agents/test_agents.py` | Classification and data tests |
+| `tests/agents/test_preprocessing.py`, `tests/agents/test_models_real_data.py`, threat tests in `tests/agents/test_agents.py` | Classification and data tests |
 
 - **Inputs:** `data/raw/cyber-pack.zip`, extracted parquet.
 - **Outputs:** `Partition`, `FeaturePipeline`, `ThreatAssessment`, `data/reports/`.
@@ -43,6 +45,8 @@ This records who is responsible for each module, not who wrote it. The first ver
 
 | Files | Responsibility |
 |---|---|
+| `backend/agents/temporal_agent.py` | Agent 4 |
+| `tests/investigation/test_tools_real_data.py` | Each tool on real records |
 | `backend/agents/anomaly_agent.py` | Agent 2 |
 | `backend/intelligence/campaign_engine.py` | Cross-flow hypotheses |
 | `backend/intelligence/feature_explainer.py` | Median/MAD baseline, deviation evidence |
@@ -58,6 +62,7 @@ This records who is responsible for each module, not who wrote it. The first ver
 
 | Files | Responsibility |
 |---|---|
+| `frontend/e2e/app.spec.ts`, `frontend/playwright.config.ts` | Browser tests, shared with Agrim |
 | `frontend/src/app/`, `frontend/src/main.tsx` | App, routes |
 | `frontend/src/components/` | `Layout`, `Sidebar`, `Navbar`, `AgentStatus`, shared `ui.tsx` |
 | `frontend/src/pages/CommandCenter.tsx` | Command Centre |
@@ -74,6 +79,7 @@ This records who is responsible for each module, not who wrote it. The first ver
 
 | Files | Responsibility |
 |---|---|
+| `frontend/src/analytics/CorrelationGroups.tsx`, `frontend/src/audit/AdaptiveDefense.tsx` | Agent 4 and Agent 5 screens |
 | `frontend/src/analytics/` | `ThreatAnalytics` (Attack Intelligence screen), `ModelMetrics`, `AnomalyAnalytics`, `ConfusionMatrix` |
 | `frontend/src/investigations/` | `InvestigationWorkbench`, `HypothesisPanel`, `IncidentTimeline` |
 | `frontend/src/evidence-graph/EvidenceGraph.tsx` | Evidence graph |

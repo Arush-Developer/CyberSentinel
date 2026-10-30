@@ -78,11 +78,50 @@ Batch: `fuse_batch(...)` returns `FusionResult`. Single flow: `fusion_output(...
 | Field | Meaning |
 |---|---|
 | `final_class`, `final_class_source` | One of the five classes, and where it came from. It stays with Agent 1 unless a validated rule is enabled |
-| `evidence_status` | `MULTI_SIGNAL_CONFIRMED`, `CLASSIFIER_ONLY`, `ANOMALY_ONLY`, `CAMPAIGN_ONLY` or `AGREED_BENIGN` |
+| `evidence_status` | With Agents 1 and 2: `AGREED_BENIGN`, `MULTI_SIGNAL_ATTACK`, `CLASSIFIER_ONLY`, `ANOMALY_ONLY` or `UNCERTAIN` (confidence below the threshold). With cross-flow evidence, also `CAMPAIGN_CORROBORATED` (attack call, Agent 2 normal, campaign support) and `CAMPAIGN_ONLY` (benign call, Agent 2 normal, inside a campaign) |
+| `confidence_status` | `CONFIDENT` or `LOW_CONFIDENCE` |
+| `evidence_refs` | The flow, agents, features, campaign and investigation behind this result |
 | `agreement` | `AGREE` or `DISAGREE`, Agent 1 against Agent 2 only |
 | `low_confidence` | Below the configured confidence |
 | `investigation_refs` | Investigations behind this result |
 | `rationale` | Explanation built only from measured values |
+
+## Agent 4: `CorrelationGroup`
+
+Built one analysed flow at a time, from records already observed. Blocked flows are not analysed, so they do not join a group.
+
+| Field | Meaning |
+|---|---|
+| `group_id` | `GRP-00001` |
+| `scope_type`, `scope_value` | `SOURCE_IP` or `DESTINATION_IP`, and the address |
+| `first_record_id`, `last_record_id` | First and latest member |
+| `member_record_ids`, `member_count` | Members. The API truncates the list; `agent4_agent5_evidence.json` keeps up to 5,000 per group |
+| `evidence` | `CorrelationEvidence`: flows in the window, confident attack flows, attack share, anomalous flows, dominant class, distinct destinations, ports and attacking sources, and the named pattern |
+
+## Agent 5: `DefensePolicy`
+
+| Field | Meaning |
+|---|---|
+| `policy_id` | `POL-00001` |
+| `activated_after_record_id` | The triggering record. The policy applies only after it |
+| `scope_type`, `scope_value` | Always `SOURCE_IP`, and the address |
+| `expires_after_record_id` | Last record the policy covers. Null while active, because it is filled in when replay reaches that record |
+| `policy_action` | Always `BLOCK` |
+| `status`, `ttl_records`, `blocked_records` | `ACTIVE` or `EXPIRED`, length in records, flows blocked |
+| `group_id`, `converging_group_id` | The Agent 4 groups behind it |
+| `rationale`, `evidence` | Measured explanation, and the group evidence at activation |
+
+The order at each record is fixed in `DefenseLoop.step`: apply active policies; if not blocked, analyse and possibly activate for later records; then expire. Replay and the CSV export both use it, and read Agents 1 to 3 evidence only, so a fresh replay reproduces the files.
+
+## Level 2 files
+
+| File | Columns |
+|---|---|
+| `classification.csv` | `record_id`, `predicted_class`, `anomaly_score`, `evidence_status`, one row per record, including blocked flows |
+| `policy.csv` | `policy_id`, `activated_after_record_id`, `scope_type`, `scope_value`, `expires_after_record_id`, `policy_action` |
+| `replay.csv` | `record_id`, `action`, `applied_policy_id`, one row per record. `applied_policy_id` is empty on ALLOW |
+
+The brief's table repeats the policy columns for `replay.csv`, while its text names `action` and `applied_policy_id`. **These replay columns and the snake_case spelling of `anomaly_score` and `evidence_status` are inferred; confirm them with the organisers.** They can be renamed in `configs/default.yaml` under `level2.columns` without code changes.
 
 ## Policy: `PolicyOutcome`
 

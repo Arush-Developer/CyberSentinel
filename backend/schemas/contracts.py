@@ -121,6 +121,8 @@ class FusionAssessment(BaseModel):
     evidence_status: str
     agreement: Literal["AGREE", "DISAGREE"]
     low_confidence: bool
+    confidence_status: Literal["CONFIDENT", "LOW_CONFIDENCE"]
+    evidence_refs: list[str]
     investigation_refs: list[str]
     rationale: str
 
@@ -152,6 +154,69 @@ class EvidenceGraph(BaseModel):
     edges: list[GraphEdge]
 
 
+class CorrelationEvidence(BaseModel):
+    window_records: int
+    flows_in_window: int
+    confident_attack_flows: int
+    attack_share: float
+    anomalous_flows: int
+    dominant_predicted_class: str | None
+    distinct_destinations: int
+    distinct_destination_ports: int
+    distinct_attacking_sources: int
+    pattern: str
+
+
+class CorrelationGroup(BaseModel):
+    """Agent 4."""
+
+    group_id: str
+    scope_type: Literal["SOURCE_IP", "DESTINATION_IP"]
+    scope_value: str
+    first_record_id: str
+    last_record_id: str
+    member_record_ids: list[str]
+    member_count: int
+    evidence: CorrelationEvidence
+
+
+class DefensePolicy(BaseModel):
+    """Agent 5. A simulated, temporary policy that applies only to later records."""
+
+    policy_id: str
+    activated_after_record_id: str
+    scope_type: Literal["SOURCE_IP"]
+    scope_value: str
+    expires_after_record_id: str | None
+    policy_action: Literal["BLOCK"]
+    status: Literal["ACTIVE", "EXPIRED"]
+    ttl_records: int
+    blocked_records: int
+    group_id: str
+    converging_group_id: str | None
+    rationale: str
+    evidence: CorrelationEvidence
+
+
+class DefenseState(BaseModel):
+    available: bool
+    unavailable_reason: str | None
+    config: dict
+    policies: list[DefensePolicy]
+    log: list[dict]
+    groups: list[CorrelationGroup]
+    groups_total: int
+
+
+class FlowDefense(BaseModel):
+    """What the last replay did with this flow."""
+
+    action: Literal["ALLOW", "BLOCK"] | None
+    applied_policy_id: str | None
+    replay_decision: Decision
+    replay_evidence_status: str
+
+
 class FlowDetail(BaseModel):
     flow_id: str
     network: dict
@@ -163,6 +228,7 @@ class FlowDetail(BaseModel):
     campaign: CampaignRecord | None
     triggers: list[str]
     investigation: InvestigationResult | None
+    replay: FlowDefense | None
     ground_truth_evaluation_only: str | None
     evidence_graph: EvidenceGraph
 
@@ -215,6 +281,8 @@ class ModelStatusResponse(BaseModel):
     anomaly_features: int
     campaign_mode: str
     campaign_limitations: list[str]
+    defense_available: bool
+    replay_input: str
     llm_in_use: bool = False
 
 
@@ -232,3 +300,7 @@ class ReplayStatus(BaseModel):
     investigation_triggers: int
     inference_flows_per_second: float | None
     latest_seq: int
+    defense_available: bool
+    active_policies: int
+    policies_activated: int
+    correlation_groups: int

@@ -2,7 +2,7 @@
 import numpy as np
 
 from backend.agents.fusion_agent import (
-    AGREED_BENIGN, ANOMALY_ONLY, CAMPAIGN_ONLY, CLASSIFIER_ONLY, MULTI_SIGNAL_CONFIRMED, FusionConfig, fuse_batch)
+    AGREED_BENIGN, ANOMALY_ONLY, CAMPAIGN_ONLY, CLASSIFIER_ONLY, MULTI_SIGNAL_ATTACK, FusionConfig, fuse_batch)
 from backend.policy.policy_engine import ALLOW, BLOCK, REVIEW, PolicyThresholds, decide_batch, simulate
 
 CLASSES = ["BENIGN", "BRUTE_FORCE", "DOS", "DDOS", "PORT_SCAN"]
@@ -27,7 +27,7 @@ def run(cls, confidence, score, campaign=False, conflict=False, config=None):
 def test_case_a_multi_signal_blocks():
     fused, decision, _ = run("DDOS", 0.96, 0.99, campaign=True)
     assert fused.final_class[0] == "DDOS"
-    assert fused.evidence_status[0] == MULTI_SIGNAL_CONFIRMED
+    assert fused.evidence_status[0] == MULTI_SIGNAL_ATTACK
     assert decision == BLOCK
 
 

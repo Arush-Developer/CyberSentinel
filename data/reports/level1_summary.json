@@ -3,6 +3,7 @@
   "level": 1,
   "partition": "eval",
   "rows": 114185,
+  "scope": "Agents 1 to 3 only (Mode B)",
   "accuracy": 0.9999474536935674,
   "macro_f1": 0.9998231651318518,
   "agent1": {
@@ -19,16 +20,16 @@
   "agent3": {
     "agreement_rate": 0.7644699391338617,
     "evidence_status_counts": {
-      "MULTI_SIGNAL_CONFIRMED": 53923,
-      "AGREED_BENIGN": 52042,
-      "CAMPAIGN_ONLY": 5788,
-      "ANOMALY_ONLY": 2171,
-      "CLASSIFIER_ONLY": 261
+      "AGREED_BENIGN": 57000,
+      "ANOMALY_ONLY": 3001,
+      "CLASSIFIER_ONLY": 23893,
+      "MULTI_SIGNAL_ATTACK": 30290,
+      "UNCERTAIN": 1
     },
     "policy_counts": {
-      "ALLOW": 52039,
-      "BLOCK": 54141,
-      "REVIEW": 8005
+      "ALLOW": 56997,
+      "BLOCK": 54168,
+      "REVIEW": 3020
     }
   }
 }

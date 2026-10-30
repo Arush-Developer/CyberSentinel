@@ -8,6 +8,7 @@ Labels are returned separately and never reach a feature matrix.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -28,14 +29,37 @@ class Partition:
 def map_labels(raw: pd.Series) -> pd.Series:
     """Apply the explicit label mapping. Unknown labels raise rather than being coerced."""
     mapping = load_config()["labels"]["mapping"]
-    unknown = sorted(set(raw.dropna().astype(str)) - set(mapping))
-    if unknown or raw.isna().any():
+    cleaned = raw.astype("string").str.strip()
+    unknown = sorted(set(cleaned.dropna()) - set(mapping))
+    if unknown or cleaned.isna().any():
         raise ValueError(f"unmapped labels (confirm with Arush before training): {unknown or 'null values'}")
-    return raw.astype(str).map(mapping)
+    return cleaned.astype(str).map(mapping)
+
+
+def standardise_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Strip stray whitespace, and accept "Source IP"-style spellings of the metadata columns."""
+    meta = {c.lower(): c for c in load_config()["data"]["metadata_columns"]}
+    renamed = {c: meta.get(c.strip().lower().replace(" ", "_"), c.strip()) for c in df.columns}
+    # "Destination Port" stays a flow feature; it is copied into the metadata in split_representations.
+    renamed = {c: c.strip() if c.strip() == PORT_FEATURE else new for c, new in renamed.items()}
+    return df.rename(columns=renamed)
+
+
+def replay_order(metadata: pd.DataFrame) -> np.ndarray:
+    """Row positions in the supplied replay order: seq, then timestamp, then numeric id, then file order."""
+    if "seq" in metadata:
+        return np.argsort(pd.to_numeric(metadata["seq"]).to_numpy(), kind="stable")
+    if "timestamp" in metadata:
+        return np.argsort(pd.to_datetime(metadata["timestamp"], errors="coerce").to_numpy(), kind="stable")
+    numeric = pd.to_numeric(metadata["flow_id"].astype(str).str.extract(r"(\d+)")[0], errors="coerce")
+    if numeric.notna().all():
+        return np.argsort(numeric.to_numpy(), kind="stable")
+    return np.arange(len(metadata))
 
 
 def split_representations(df: pd.DataFrame) -> Partition:
     cfg = load_config()["data"]
+    df = standardise_columns(df)
     id_col, label_col = cfg["id_column"], cfg["label_column"]
     meta_cols = [c for c in cfg["metadata_columns"] if c in df.columns]
     drop = {id_col, label_col, *meta_cols}
@@ -44,13 +68,22 @@ def split_representations(df: pd.DataFrame) -> Partition:
     # Destination Port is a flow feature in this pack, and also needed for campaign analysis.
     if "destination_port" not in metadata and PORT_FEATURE in features:
         metadata["destination_port"] = features[PORT_FEATURE].to_numpy()
+    if "destination_port" in metadata and PORT_FEATURE not in features:
+        features = features.assign(**{PORT_FEATURE: metadata["destination_port"].to_numpy()})
     labels = map_labels(df[label_col]).reset_index(drop=True) if label_col in df else None
     return Partition(features.reset_index(drop=True), metadata, labels)
 
 
+def load_flows(path) -> Partition:
+    """Load any flow file, labelled or not, such as the hidden set when it is released."""
+    path = Path(path)
+    frame = pd.read_csv(path) if path.suffix.lower() == ".csv" else pd.read_parquet(path)
+    return split_representations(frame)
+
+
 def load_partition(which: str) -> Partition:
     key = {"training": "training_parquet", "eval": "eval_parquet"}[which]
-    return split_representations(pd.read_parquet(resolve(load_config()["data"][key])))
+    return load_flows(resolve(load_config()["data"][key]))
 
 
 @dataclass

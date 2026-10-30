@@ -54,3 +54,11 @@ Threshold fields: `allow_benign_confidence`, `block_multi_signal_confidence`, `b
 | `POST /replay/stop` | Global stop. Also cancels running investigations |
 | `GET /replay/status` | Status, cursor, progress and counts |
 | `GET /replay/events?since=&once=` | Server-Sent Events: `state`, `flows`, `campaign`, `investigation`, `error`. `once=true` returns the backlog and closes |
+
+## Agents 4 and 5
+
+| Method and path | Purpose |
+|---|---|
+| `GET /defense?member_limit=25&group_limit=200` | Correlation groups, policies, the activation and expiry log, and the configuration. `available` is false, with a reason, when the replay input has no source addresses |
+
+Replay events also include `policy` (activation), and each flow carries `defense_action` and `applied_policy_id`. To replay a file with endpoints, set `CYBERSENTINEL_REPLAY_INPUT=PATH` when starting the backend.

@@ -69,6 +69,11 @@ function Detail({ flowId }: { flowId: string }) {
           <DecisionBadge decision={data.policy.decision} />
           <span className="text-xs text-text-3">{data.policy.decision_reason} (simulated)</span>
         </div>
+        {data.replay?.action && (
+          <p className="mt-2 text-xs text-text-2">
+            In the last replay, Agent 5 {data.replay.action === "BLOCK" ? <>blocked this flow under <span className="text-crit num">{data.replay.applied_policy_id}</span>, activated by earlier flows.</> : "allowed this flow and analysed it."}
+          </p>
+        )}
         <p className="mt-3 text-text-1 leading-relaxed">{data.fusion.rationale}</p>
         <p className="mt-2 text-xs text-text-3">
           Label, shown for evaluation only and unseen by every agent: <span className="text-text-2">{data.ground_truth_evaluation_only ?? "none"}</span>

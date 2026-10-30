@@ -101,6 +101,8 @@ export interface FusionAssessment {
   evidence_status: string;
   agreement: string;
   low_confidence: boolean;
+  confidence_status: "CONFIDENT" | "LOW_CONFIDENCE";
+  evidence_refs: string[];
   investigation_refs: string[];
   rationale: string;
 }
@@ -128,8 +130,80 @@ export interface FlowDetail {
   campaign: CampaignRecord | null;
   triggers: string[];
   investigation: InvestigationResult | null;
+  replay: FlowDefense | null;
   ground_truth_evaluation_only: string | null;
   evidence_graph: EvidenceGraph;
+}
+
+export interface FlowDefense {
+  action: "ALLOW" | "BLOCK" | null;
+  applied_policy_id: string | null;
+  replay_decision: Decision;
+  replay_evidence_status: string;
+}
+
+export interface CorrelationEvidence {
+  window_records: number;
+  flows_in_window: number;
+  confident_attack_flows: number;
+  attack_share: number;
+  anomalous_flows: number;
+  dominant_predicted_class: string | null;
+  distinct_destinations: number;
+  distinct_destination_ports: number;
+  distinct_attacking_sources: number;
+  pattern: string;
+}
+
+export interface CorrelationGroup {
+  group_id: string;
+  scope_type: "SOURCE_IP" | "DESTINATION_IP";
+  scope_value: string;
+  first_record_id: string;
+  last_record_id: string;
+  member_record_ids: string[];
+  member_count: number;
+  evidence: CorrelationEvidence;
+}
+
+export interface DefensePolicy {
+  policy_id: string;
+  activated_after_record_id: string;
+  scope_type: "SOURCE_IP";
+  scope_value: string;
+  expires_after_record_id: string | null;
+  policy_action: "BLOCK";
+  status: "ACTIVE" | "EXPIRED";
+  ttl_records: number;
+  blocked_records: number;
+  group_id: string;
+  converging_group_id: string | null;
+  rationale: string;
+  evidence: CorrelationEvidence;
+}
+
+export interface DefenseLogEntry {
+  event: "ACTIVATED" | "EXPIRED";
+  policy_id: string;
+  record_id: string;
+  position: number;
+  scope_value: string;
+}
+
+export interface DefenseState {
+  available: boolean;
+  unavailable_reason: string | null;
+  config: Record<string, number>;
+  policies: DefensePolicy[];
+  log: DefenseLogEntry[];
+  groups: CorrelationGroup[];
+  groups_total: number;
+}
+
+export interface PolicyEvent {
+  seq: number;
+  action: string;
+  policy: Pick<DefensePolicy, "policy_id" | "scope_type" | "scope_value" | "activated_after_record_id" | "ttl_records" | "group_id" | "rationale">;
 }
 
 export interface FlowRow {
@@ -159,6 +233,7 @@ export interface ReplayStatus {
     decisions: Record<Decision, number>;
     agreement: Record<string, number>;
     evidence: Record<string, number>;
+    defense: Record<"ALLOW" | "BLOCK", number>;
   };
   campaigns: number;
   campaign_mode: string;
@@ -166,6 +241,10 @@ export interface ReplayStatus {
   investigation_triggers: number;
   inference_flows_per_second: number | null;
   latest_seq: number;
+  defense_available: boolean;
+  active_policies: number;
+  policies_activated: number;
+  correlation_groups: number;
 }
 
 export interface ModelStatus {
@@ -178,6 +257,8 @@ export interface ModelStatus {
   anomaly_features: number;
   campaign_mode: string;
   campaign_limitations: string[];
+  defense_available: boolean;
+  replay_input: string;
   llm_in_use: boolean;
 }
 
@@ -228,6 +309,8 @@ export interface ReplayFlowEvent {
   policy_rule: string;
   campaign_id: string | null;
   investigation_triggered: boolean;
+  defense_action: "ALLOW" | "BLOCK" | null;
+  applied_policy_id: string | null;
   ground_truth_evaluation_only: string | null;
 }
 export interface CampaignEvent { seq: number; action: string; campaign: CampaignRecord }

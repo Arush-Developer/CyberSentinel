@@ -18,6 +18,11 @@ interface Metrics {
     agent1_excluding_rows_also_in_training: ClassReport & { excluded_rows: number };
     agent2: Agent2Report;
     ablation: Record<string, { macro_f1: number; accuracy: number; policy: PolicyOutcome } | string>;
+    evaluation_modes?: Record<string, {
+      accuracy: number; macro_f1: number; false_positive_rate?: number; false_negative_rate?: number;
+      agent_agreement_rate?: number | null; latency_ms_per_1k_flows?: number; replay_analysis_flows_per_second?: number;
+      policy: PolicyOutcome & { counts: Record<string, number> };
+    }>;
     investigation: { triggered: number; investigated: number; verdicts: Record<string, number> };
     latency: Record<string, number>;
   } | null;
@@ -31,6 +36,13 @@ interface Metrics {
   leakage_audit: { cumulative_top_feature_knockout: { removed: number; macro_f1: number }[] } | null;
   dataset: Record<string, { rows: number; label_distribution: Record<string, number> }> | null;
 }
+
+const MODE_ROWS = [
+  ["mode_a_classifier_alone", "A: classifier alone"],
+  ["mode_b_with_anomaly_and_fusion", "B: + anomaly and fusion"],
+  ["mode_c_complete_system", "C: complete system, batch"],
+  ["mode_c_causal_replay", "C: complete system, causal replay"],
+] as const;
 
 const LAYER_NAMES: Record<string, string> = {
   agent1_alone: "Agent 1 alone", agent1_plus_agent2: "+ Agent 2 anomaly", plus_campaign_intelligence: "+ Campaign intelligence", plus_investigation: "+ Investigation",
@@ -136,6 +148,32 @@ export function ModelMetrics() {
           </table>
         </TableWrap>
       </Panel>
+      {ev.evaluation_modes && (
+        <Panel title="Evaluation modes" hint="The same official records through each configuration. Mode C causal is the live replay, which only ever looks backwards.">
+          <TableWrap>
+            <table className="w-full num">
+              <thead><tr>{["Mode", "Accuracy", "Macro-F1", "False-positive rate", "False-negative rate", "Agent agreement", "Allow / block / review", "Speed"].map((h) => <th key={h} className={thCls}>{h}</th>)}</tr></thead>
+              <tbody>
+                {MODE_ROWS.map(([key, label]) => {
+                  const mode = ev.evaluation_modes![key];
+                  return (
+                    <tr key={key}>
+                      <td className={tdCls}>{label}</td>
+                      <td className={tdCls}>{mode.accuracy.toFixed(5)}</td>
+                      <td className={tdCls}>{mode.macro_f1.toFixed(5)}</td>
+                      <td className={tdCls}>{pct(mode.false_positive_rate ?? null, 4)}</td>
+                      <td className={tdCls}>{pct(mode.false_negative_rate ?? null, 4)}</td>
+                      <td className={tdCls}>{mode.agent_agreement_rate == null ? "n/a" : pct(mode.agent_agreement_rate, 1)}</td>
+                      <td className={tdCls}>{fmt(mode.policy.counts.ALLOW)} / {fmt(mode.policy.counts.BLOCK)} / {fmt(mode.policy.counts.REVIEW)}</td>
+                      <td className={tdCls}>{mode.replay_analysis_flows_per_second ? `${fmt(mode.replay_analysis_flows_per_second)} flows/s` : `${mode.latency_ms_per_1k_flows?.toFixed(2)} ms per 1k flows`}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </TableWrap>
+        </Panel>
+      )}
       <div className="grid lg:grid-cols-2 gap-3">
         <Panel title="Validation class distribution">
           <BarList items={CLASSES.map((c) => ({ label: c, value: dist[c] ?? 0, color: CLASS_COLOR[c] }))} />

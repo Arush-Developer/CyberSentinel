@@ -9,16 +9,20 @@ import json
 import threading
 import time
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 import pandas as pd
 
-from backend.agents.investigation_orchestrator import InvestigationCancelled, Orchestrator, triggers_for
-from backend.config import resolve
+from backend.agents.defense_agent import BLOCK, DefenseLoop
+from backend.agents.investigation_orchestrator import (
+    VERDICT_CONFLICTING, InvestigationCancelled, Orchestrator, triggers_for)
+from backend.config import load_config, resolve
 from backend.intelligence.campaign_engine import CampaignEngine, CampaignResult, CampaignTracker
 from backend.investigation.audit import AuditLog
 from backend.investigation.registry import ToolRegistry
+from backend.preprocessing.data_processor import replay_order
+from backend.services.level2 import defense_config, temporal_config
 from backend.services.model_service import HIGH_ANOMALY, Analysis, Pipeline
 
 STATE_FILE = "data/processed/replay_state.json"
@@ -44,8 +48,12 @@ class ReplayEngine:
         self.audit = audit
         self.persist = persist
         partition = analysis.partition
-        numeric = partition.metadata["flow_id"].astype(str).str.extract(r"(\d+)")[0].astype(np.int64).to_numpy()
-        self.order = np.argsort(numeric, kind="stable")
+        self.order = replay_order(partition.metadata)
+        self.defense_available = {"source_ip", "destination_ip"} <= set(partition.metadata.columns)
+        self.defense = self._new_defense()
+        # Replay tools see only records up to the flow in question, and only the campaigns found so far.
+        self.store = replace(analysis.store, causal=True, flow_campaign=np.full(len(analysis.frame), None, dtype=object),
+                             campaigns={})
         self.settings = ReplaySettings()
         self._lock = threading.RLock()
         self._events: deque[dict] = deque(maxlen=EVENT_BUFFER)
@@ -69,9 +77,14 @@ class ReplayEngine:
         mode = self.analysis.campaign.mode
         return CampaignTracker(mode, self.pipeline.campaign_engine.config)
 
+    def _new_defense(self) -> DefenseLoop | None:
+        cfg = load_config().get("level2", {})
+        return DefenseLoop(temporal_config(cfg), defense_config(cfg)) if self.defense_available else None
+
     def _empty_counts(self) -> dict:
         return {
             "total": 0,
+            "defense": {"ALLOW": 0, "BLOCK": 0},
             "classes": {c: 0 for c in self.pipeline.threat.classes},
             "decisions": {"ALLOW": 0, "BLOCK": 0, "REVIEW": 0},
             "agreement": {"AGREE": 0, "DISAGREE": 0},
@@ -95,10 +108,16 @@ class ReplayEngine:
             if self.status in (RUNNING, PAUSED):
                 raise RuntimeError("replay is already active; stop it first")
             self.settings = ReplaySettings(speed, batch_size, limit, max_investigations_per_batch)
-            if not (resume_saved and self.cursor and self.cursor < self._target()):
+            resuming = bool(resume_saved and self.cursor and self.cursor < self._target())
+            if resuming:
+                self._align_to_processed()
+            else:
                 self.cursor = 0
                 self.counts = self._empty_counts()
                 self.tracker = self._new_tracker()
+                self.defense = self._new_defense()
+                self.store.flow_campaign[:] = None
+                self.store.campaigns = {}
                 self.results = []
                 self.investigations = {}
                 self.investigation_triggers = 0
@@ -110,7 +129,7 @@ class ReplayEngine:
             self._thread = threading.Thread(target=self._run, name="replay", daemon=True)
             self._thread.start()
         self.audit.record("replay_control", action="start", speed=speed, batch_size=batch_size,
-                          limit=limit, resumed=bool(resume_saved and self.cursor))
+                          limit=limit, resumed=resuming)
         self._emit("state", status=RUNNING, cursor=self.cursor)
         return self.snapshot()
 
@@ -159,6 +178,10 @@ class ReplayEngine:
             return {
                 "status": self.status,
                 "cursor": self.cursor,
+                "defense_available": self.defense_available,
+                "active_policies": self.defense.defense.active_count if self.defense else 0,
+                "policies_activated": len(self.defense.defense.policies) if self.defense else 0,
+                "correlation_groups": len(self.defense.temporal.groups) if self.defense else 0,
                 "total": target,
                 "progress": self.cursor / target if target else 0.0,
                 "speed": self.settings.speed,
@@ -221,8 +244,11 @@ class ReplayEngine:
         fusion = self.pipeline.fuse(proba, scores, campaign_support=support, campaign_conflict=conflict)
 
         ids = metadata["flow_id"].to_numpy()
+        self.store.flow_campaign[rows] = flow_campaign
+        self.store.campaigns = {c["campaign_id"]: c for c in result.campaigns}
         triggered = self._investigate(rows, ids, fusion, scores, flow_campaign, conflict)
         out = self.pipeline.results_frame(ids, proba, fusion, flow_campaign)
+        new_policies = self._apply_defense(out, metadata)
         self.processing_seconds += time.perf_counter() - started
 
         with self._lock:
@@ -234,8 +260,14 @@ class ReplayEngine:
         for record in campaigns[:known]:
             if record["campaign_id"] in touched:
                 self._emit("campaign", action="updated", campaign=self._campaign_brief(record))
-        self._release(out, partition.labels.to_numpy()[rows] if partition.labels is not None else None, triggered)
+        self._release(out, partition.labels.to_numpy()[rows] if partition.labels is not None else None, triggered,
+                      new_policies)
         self._save()
+
+    @staticmethod
+    def _policy_brief(policy: dict) -> dict:
+        return {k: policy[k] for k in ("policy_id", "scope_type", "scope_value", "activated_after_record_id",
+                                       "ttl_records", "group_id", "rationale")}
 
     @staticmethod
     def _campaign_brief(record: dict) -> dict:
@@ -253,8 +285,10 @@ class ReplayEngine:
             return triggered
         # Spend the per-batch budget on the most unusual triggered flows.
         chosen = np.flatnonzero(triggered)[np.argsort(-scores[triggered], kind="stable")[:budget]]
-        registry = ToolRegistry(self.analysis.store, self.audit)
+        registry = ToolRegistry(self.store, self.audit)
         orchestrator = Orchestrator(registry, cancel=self._stop)
+        investigation_conflict = np.zeros(len(rows), bool)
+        solo = self.pipeline.thresholds.block_classifier_only_confidence
         try:
             for i in chosen:
                 try:
@@ -263,14 +297,67 @@ class ReplayEngine:
                     break
                 with self._lock:
                     self.investigations[str(ids[i])] = result
+                # The same feedback as the batch path: an unresolved conflict holds back an unsure decision.
+                if result["verdict"] == VERDICT_CONFLICTING and fusion.threat_confidence[i] < solo:
+                    investigation_conflict[i] = True
                 self._emit("investigation", flow_id=str(ids[i]), investigation_id=result["investigation_id"],
                            triggers=result["triggers"], verdict=result["verdict"],
                            tools=[c["tool"] for c in result["tool_calls"]])
         finally:
             registry.close()
+        fusion.investigation_conflict = investigation_conflict
         return triggered
 
-    def _release(self, out: pd.DataFrame, truth, triggered: np.ndarray) -> None:
+    def _apply_defense(self, out: pd.DataFrame, metadata: pd.DataFrame) -> dict[int, dict]:
+        """Agents 4 and 5, one flow at a time in replay order. Returns policies by batch position."""
+        if self.defense is None:
+            out["defense_action"] = None
+            out["applied_policy_id"] = None
+            return {}
+        offset = self._processed_rows()
+        actions, applied, created = [], [], {}
+        # Agents 1-3 alone, as in the export, so a fresh replay reproduces the submitted files exactly.
+        proba = out[[f"proba_{c}" for c in self.pipeline.threat.classes]].to_numpy()
+        status = self.pipeline.fuse_level1(proba, out["anomaly_score"].to_numpy()).evidence_status
+        for i, (src, dst, port, r) in enumerate(zip(metadata["source_ip"].astype(str), metadata["destination_ip"].astype(str),
+                                                    metadata["destination_port"], out.itertuples(index=False))):
+            step = self.defense.step(offset + i, str(r.flow_id), src, dst, float(port), r.final_class,
+                                     float(r.threat_confidence), float(r.anomaly_score), bool(r.is_anomaly), status[i])
+            actions.append(step["action"])
+            applied.append(step["applied_policy_id"])
+            if step["activated_policy"]:
+                created[i] = step["activated_policy"]
+        out["defense_action"] = actions
+        out["applied_policy_id"] = applied
+        if offset + len(out) >= self._target():
+            self.defense.finish(offset + len(out) - 1, str(out["flow_id"].iat[-1]))
+        return created
+
+    def _processed_rows(self) -> int:
+        with self._lock:
+            return sum(len(r) for r in self.results)
+
+    def _align_to_processed(self) -> None:
+        """A stop can land mid-batch, but the whole batch was already analysed. Resume after that batch."""
+        processed = pd.concat(self.results, ignore_index=True) if self.results else pd.DataFrame()
+        self.results = [processed] if len(processed) else []
+        self.counts = self._empty_counts()
+        if len(processed):
+            self._count(processed)
+        self.cursor = len(processed)
+        self.store.flow_campaign[:] = None
+        for row, cid in zip(self.order[:len(processed)], processed["campaign_id"].to_numpy()):
+            self.store.flow_campaign[row] = cid
+        self.store.campaigns = {c["campaign_id"]: c for c in self.tracker.public_campaigns()}
+        # The defence state is deterministic, so it is rebuilt by re-stepping the same flows.
+        self.defense = self._new_defense()
+        if self.defense is not None and len(processed):
+            metadata = self.analysis.partition.metadata.iloc[self.order[:len(processed)]].reset_index(drop=True)
+            self.results = []
+            self._apply_defense(processed, metadata)
+            self.results = [processed]
+
+    def _release(self, out: pd.DataFrame, truth, triggered: np.ndarray, new_policies: dict[int, dict] | None = None) -> None:
         """Hand results to listeners at the requested speed. Stop is honoured between chunks."""
         speed = max(self.settings.speed, 1.0)
         chunk = max(1, int(speed / 20))
@@ -283,6 +370,9 @@ class ReplayEngine:
                 return
             part = out.iloc[i:i + chunk]
             tick = time.perf_counter()
+            for at in sorted(new_policies or {}):
+                if i <= at < i + len(part):
+                    self._emit("policy", action="activated", policy=self._policy_brief(new_policies[at]))
             self._count(part)
             with self._lock:
                 self.cursor += len(part)
@@ -295,6 +385,7 @@ class ReplayEngine:
                 "agreement": r.agreement, "final_class": r.final_class, "evidence_status": r.evidence_status,
                 "policy_decision": r.policy_decision, "policy_rule": r.policy_rule,
                 "campaign_id": r.campaign_id, "investigation_triggered": bool(triggered[i + j]),
+                "defense_action": r.defense_action, "applied_policy_id": r.applied_policy_id or None,
                 "ground_truth_evaluation_only": str(truth[i + j]) if truth is not None else None,
             } for j, r in enumerate(shown.itertuples(index=False))]
             self._emit("flows", cursor=cursor, total=self._target(), flows=flows, flows_in_chunk=len(part),
@@ -309,11 +400,19 @@ class ReplayEngine:
             c = self.counts
             c["total"] += len(part)
             for key, col in (("classes", "final_class"), ("decisions", "policy_decision"), ("agreement", "agreement"),
-                             ("evidence", "evidence_status")):
+                             ("evidence", "evidence_status"), ("defense", "defense_action")):
                 for name, n in part[col].value_counts().items():
                     c[key][name] = c[key].get(name, 0) + int(n)
 
     # ---- Results and persistence --------------------------------------------------------------
+    @property
+    def lock(self) -> threading.RLock:
+        return self._lock
+
+    def position_of(self, flow_id: str) -> int | None:
+        row = self.analysis.store.index.get(str(flow_id))
+        return None if row is None else int(self.store.rank_of[row])
+
     def replayed_frame(self) -> pd.DataFrame:
         with self._lock:
             if not self.results:
@@ -364,6 +463,20 @@ class ReplayEngine:
             if resolve(RESULTS_FILE).exists():
                 self.results = [pd.read_parquet(resolve(RESULTS_FILE))]
             self.cursor = min(self.cursor, sum(len(r) for r in self.results))
+            self.counts.setdefault("defense", {"ALLOW": 0, "BLOCK": 0})
+            # Results from a different input, or from before Agents 4 and 5, cannot be continued.
+            if self.results and ("defense_action" not in self.results[0]
+                                 or not self._same_flows(self.results[0])):
+                raise ValueError("saved results do not match the current replay input")
+            self.store.campaigns = {c["campaign_id"]: c for c in self.tracker.public_campaigns()}
+            if self.results:
+                self._align_to_processed()
         except (KeyError, ValueError, TypeError, OSError) as exc:
             self.audit.record("replay_error", error=f"could not restore saved replay state: {exc}")
             self.status, self.cursor = IDLE, 0
+            self.results, self.counts = [], self._empty_counts()
+            self.tracker = self._new_tracker()
+
+    def _same_flows(self, frame: pd.DataFrame) -> bool:
+        ids = self.analysis.partition.metadata["flow_id"].to_numpy()[self.order[:len(frame)]]
+        return np.array_equal(ids.astype(str), frame["flow_id"].to_numpy().astype(str))

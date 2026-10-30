@@ -77,4 +77,9 @@ def build_evidence_graph(detail: dict) -> dict:
     policy = "decision:policy"
     nodes.append(_node(policy, "policy", detail["policy"]["decision"], rule=detail["policy"]["policy_rule"], reason=detail["policy"]["decision_reason"]))
     edges.append(_edge(final, policy, "simulated decision"))
+    replay = detail.get("replay")
+    if replay and replay.get("applied_policy_id"):
+        applied = f"defense:{replay['applied_policy_id']}"
+        nodes.append(_node(applied, "policy", f"Agent 5: BLOCK by {replay['applied_policy_id']}"))
+        edges.append(_edge(applied, root, "active policy blocked this later flow"))
     return {"nodes": nodes, "edges": edges}

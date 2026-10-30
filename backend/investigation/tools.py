@@ -12,6 +12,7 @@ import pandas as pd
 
 from backend.agents.anomaly_agent import AnomalyAgent
 from backend.intelligence.feature_explainer import MIN_EVIDENCE_Z
+from backend.preprocessing.data_processor import replay_order
 
 SUPPORTS_ATTACK, SUPPORTS_BENIGN, NEUTRAL = "attack", "benign", "neutral"
 
@@ -30,12 +31,12 @@ class EvidenceStore:
     flow_campaign: np.ndarray
     campaigns: dict
     anomaly_agent: AnomalyAgent
+    # During replay a tool may only see records up to the flow it was asked about.
+    causal: bool = False
 
     def __post_init__(self) -> None:
         self.index = {str(fid): i for i, fid in enumerate(self.flow_ids)}
-        numeric = self.metadata["flow_id"].astype(str).str.extract(r"(\d+)")[0]
-        self.order_key = pd.to_numeric(numeric, errors="coerce").to_numpy()
-        self.sorted_rows = np.argsort(self.order_key, kind="stable")
+        self.sorted_rows = replay_order(self.metadata)
         self.rank_of = np.empty(len(self.sorted_rows), dtype=np.int64)
         self.rank_of[self.sorted_rows] = np.arange(len(self.sorted_rows))
         self._X = None
@@ -60,7 +61,7 @@ class EvidenceStore:
 
     def neighbours(self, row: int, window: int) -> np.ndarray:
         rank = self.rank_of[row]
-        start, stop = max(rank - window, 0), rank + window + 1
+        start, stop = max(rank - window, 0), rank + 1 if self.causal else rank + window + 1
         return self.sorted_rows[start:stop]
 
     def has(self, *columns: str) -> bool:
@@ -132,8 +133,8 @@ def _activity(store: EvidenceStore, column: str, value: str, time_window: int, a
     meta = store.metadata[column].astype(str).to_numpy()
     candidates = np.flatnonzero(meta == str(value))
     if anchor is not None:
-        rank = store.rank_of
-        candidates = candidates[np.abs(rank[candidates] - rank[anchor]) <= time_window]
+        distance = store.rank_of[candidates] - store.rank_of[anchor]
+        candidates = candidates[(distance >= -time_window) & (distance <= (0 if store.causal else time_window))]
     return {"rows": candidates, "flows": len(candidates)}
 
 

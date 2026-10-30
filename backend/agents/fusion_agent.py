@@ -14,11 +14,14 @@ from backend.schemas.contracts import FusionAssessment
 
 BENIGN = "BENIGN"
 
-MULTI_SIGNAL_CONFIRMED = "MULTI_SIGNAL_CONFIRMED"
-CLASSIFIER_ONLY = "CLASSIFIER_ONLY"
-ANOMALY_ONLY = "ANOMALY_ONLY"
+AGREED_BENIGN = "AGREED_BENIGN"  # BENIGN call, normal anomaly assessment.
+MULTI_SIGNAL_ATTACK = "MULTI_SIGNAL_ATTACK"  # Attack call, abnormal anomaly assessment.
+CLASSIFIER_ONLY = "CLASSIFIER_ONLY"  # Attack call, normal anomaly assessment.
+ANOMALY_ONLY = "ANOMALY_ONLY"  # BENIGN call, abnormal anomaly assessment.
+UNCERTAIN = "UNCERTAIN"  # Classifier confidence below the configured threshold.
+# With cross-flow evidence only: Agent 2 saw nothing unusual, but a campaign hypothesis covers the flow.
+CAMPAIGN_CORROBORATED = "CAMPAIGN_CORROBORATED"
 CAMPAIGN_ONLY = "CAMPAIGN_ONLY"
-AGREED_BENIGN = "AGREED_BENIGN"
 
 AGREE = "AGREE"
 DISAGREE = "DISAGREE"
@@ -73,15 +76,18 @@ def fuse_batch(proba: np.ndarray, classes: list[str], anomaly_score: np.ndarray,
 
     predicted_attack = final_class != BENIGN
     status = np.full(n, AGREED_BENIGN, dtype=object)
-    status[~predicted_attack & is_anomaly] = ANOMALY_ONLY
     status[~predicted_attack & campaign_support] = CAMPAIGN_ONLY
+    status[~predicted_attack & is_anomaly] = ANOMALY_ONLY
     status[predicted_attack] = CLASSIFIER_ONLY
-    status[predicted_attack & (is_anomaly | campaign_support)] = MULTI_SIGNAL_CONFIRMED
+    status[predicted_attack & campaign_support] = CAMPAIGN_CORROBORATED
+    status[predicted_attack & is_anomaly] = MULTI_SIGNAL_ATTACK
+    low_confidence = confidence < config.low_confidence
+    status[low_confidence] = UNCERTAIN
 
     # Agreement is about Agent 1 versus Agent 2 only: attack call against anomaly flag.
     agreement = np.where((threat_class != BENIGN) == is_anomaly, AGREE, DISAGREE)
     return FusionResult(final_class, source, threat_class, confidence, anomaly_score, is_anomaly,
-                        agreement, status, confidence < config.low_confidence,
+                        agreement, status, low_confidence,
                         campaign_support, campaign_conflict, investigation_conflict)
 
 
@@ -117,8 +123,15 @@ def rationale(result: FusionResult, i: int, supporting: list[dict] | None = None
 
 
 def fusion_output(result: FusionResult, i: int, flow_id: str, supporting: list[dict] | None = None,
-                  campaign_type: str | None = None, investigation: dict | None = None) -> dict:
+                  campaign_type: str | None = None, investigation: dict | None = None,
+                  campaign_id: str | None = None) -> dict:
     note = f"Investigation verdict: {investigation['verdict']}." if investigation else None
+    refs = [f"flow:{flow_id}", "agent:threat_detection", "agent:anomaly_detection"]
+    refs += [f"feature:{item['feature']}" for item in supporting or []]
+    if campaign_id:
+        refs.append(f"campaign:{campaign_id}")
+    if investigation:
+        refs.append(f"investigation:{investigation['investigation_id']}")
     return FusionAssessment(
         flow_id=flow_id,
         final_class=str(result.final_class[i]),
@@ -126,6 +139,8 @@ def fusion_output(result: FusionResult, i: int, flow_id: str, supporting: list[d
         evidence_status=str(result.evidence_status[i]),
         agreement=str(result.agreement[i]),
         low_confidence=bool(result.low_confidence[i]),
+        confidence_status="LOW_CONFIDENCE" if result.low_confidence[i] else "CONFIDENT",
+        evidence_refs=refs,
         investigation_refs=[investigation["investigation_id"]] if investigation else [],
         rationale=rationale(result, i, supporting, campaign_type, note),
     ).model_dump()

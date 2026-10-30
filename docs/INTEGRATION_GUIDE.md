@@ -81,10 +81,21 @@ See [TEAM_HANDOFF.md](TEAM_HANDOFF.md#git-workflow). After each merge, run the t
 
 ## When the hidden set arrives
 
-1. Confirm the file has the 78 feature columns, then run `scripts/score_records.py`.
-2. If `source_ip`, `destination_ip` and `seq` or `timestamp` are present, the campaign engine switches to endpoint mode by itself.
-3. Those detectors have only been tested on synthetic fixtures, so review the campaigns before relying on them. Column names are assumed from the pack README; if they differ, change `metadata_columns` in `configs/default.yaml` and rename at load time.
-4. Replay and the dashboard read the eval partition. To show hidden data, add the partition to `load_partition` and pass it to `AppState.load`.
+The input must have `source_ip` and `destination_ip`, and it is replayed in `seq` order when `seq` exists. No model is retrained.
+
+```bash
+.venv/bin/python scripts/run_level2.py --input PATH/TO/hidden.parquet --out-dir data/processed/level2
+```
+
+This writes `classification.csv`, `policy.csv`, `replay.csv` and `agent4_agent5_evidence.json`, and exits with an error if the files break the brief's rules. It uploads nothing. CSV input also works.
+
+Before submitting, confirm the `replay.csv` columns and the `anomaly_score` and `evidence_status` spellings with the organisers: see [MODULE_CONTRACTS.md](MODULE_CONTRACTS.md#level-2-files). Agents 4 and 5 use engineering defaults, because the pack has no endpoints to tune on. Look at the hidden set's endpoint counts first, without any labels, and adjust `level2` in `configs/default.yaml` if needed. Keep the same configuration for the demonstration, so that a fresh replay reproduces the files.
+
+To show the same run on the website:
+
+```bash
+CYBERSENTINEL_REPLAY_INPUT=PATH/TO/hidden.parquet .venv/bin/uvicorn backend.main:app --port 8000
+```
 
 ## Troubleshooting
 

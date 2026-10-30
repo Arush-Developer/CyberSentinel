@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from backend.preprocessing.data_processor import (
-    FeaturePipeline, internal_splits, map_labels, row_groups, split_representations)
+    FeaturePipeline, internal_splits, map_labels, replay_order, row_groups, split_representations)
 
 
 def frame():
@@ -63,3 +63,30 @@ def test_internal_splits_keep_duplicates_together():
     assert not set(groups[s.fit]) & set(groups[s.calibration])
     assert not set(groups[s.selection]) & set(groups[s.calibration])
     assert len(s.fit) + len(s.selection) + len(s.calibration) == len(base)
+
+
+def test_column_and_label_strings_are_standardised():
+    raw = frame().rename(columns={"A": " A ", "Destination Port": " Destination Port"})
+    raw["label"] = [" BENIGN", "DOS ", "BENIGN", "DDOS"]
+    raw["Source IP"] = "10.0.0.1"
+    part = split_representations(raw)
+    assert "A" in part.features and "Destination Port" in part.features
+    assert part.labels.tolist() == ["BENIGN", "DOS", "BENIGN", "DDOS"]
+    assert part.metadata["source_ip"].tolist() == ["10.0.0.1"] * 4 and "Source IP" not in part.features
+
+
+def test_unlabelled_file_is_accepted_and_port_metadata_is_recovered():
+    raw = frame().drop(columns=["label", "Destination Port"]).assign(destination_port=[1.0, 2.0, 3.0, 4.0])
+    part = split_representations(raw)
+    assert part.labels is None and part.features["Destination Port"].tolist() == [1.0, 2.0, 3.0, 4.0]
+
+
+@pytest.mark.parametrize("meta, expected", [
+    ({"flow_id": ["C3", "C1", "C2"], "seq": [2, 0, 1]}, [1, 2, 0]),
+    ({"flow_id": ["C3", "C1", "C2"]}, [1, 2, 0]),
+    ({"flow_id": ["a-x", "b-y", "c-z"]}, [0, 1, 2]),
+    ({"flow_id": ["C1", "C2"], "timestamp": ["2017-07-07 10:00:02", "2017-07-07 10:00:01"]}, [1, 0]),
+])
+def test_replay_order_prefers_the_supplied_order(meta, expected):
+    assert replay_order(pd.DataFrame(meta)).tolist() == expected
+

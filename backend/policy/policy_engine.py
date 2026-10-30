@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass
 
 import numpy as np
 
-from backend.agents.fusion_agent import BENIGN, MULTI_SIGNAL_CONFIRMED, FusionResult
+from backend.agents.fusion_agent import BENIGN, CAMPAIGN_CORROBORATED, MULTI_SIGNAL_ATTACK, FusionResult
 from backend.config import resolve
 from backend.schemas.contracts import PolicyOutcome
 
@@ -48,7 +48,7 @@ def decide_batch(fusion: FusionResult, t: PolicyThresholds) -> tuple[np.ndarray,
     n = len(fusion.final_class)
     conf = fusion.threat_confidence
     attack = fusion.final_class != BENIGN
-    multi = fusion.evidence_status == MULTI_SIGNAL_CONFIRMED
+    multi = np.isin(fusion.evidence_status, [MULTI_SIGNAL_ATTACK, CAMPAIGN_CORROBORATED])
     unresolved = fusion.campaign_conflict | fusion.investigation_conflict
 
     decision = np.full(n, REVIEW, dtype=object)

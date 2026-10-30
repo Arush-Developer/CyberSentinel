@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { EvidenceGraph } from "../evidence-graph/EvidenceGraph";
+import { CorrelationGroups } from "./CorrelationGroups";
 import { Btn, Empty, Notice, Page, Panel, TableWrap, Tag, fmt, tdCls, thCls } from "../components/ui";
 import { useApi } from "../services/api";
 import type { CampaignRecord, GraphEdge, GraphNode } from "../services/types";
@@ -169,6 +170,7 @@ export function ThreatAnalytics() {
           </Panel>
         </>
       )}
+      <CorrelationGroups />
     </Page>
   );
 }

@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 
 from backend.schemas.contracts import (
     AnalyseFlowRequest, FlowDetail, HealthResponse, InvestigationResult, ModelStatusResponse, PolicyConfigureRequest,
-    PolicySimulateRequest, ReplayStartRequest, ReplayStatus)
+    DefenseState, PolicySimulateRequest, ReplayStartRequest, ReplayStatus)
 
 router = APIRouter(prefix="/api")
 SSE_POLL_SECONDS = 0.2
@@ -39,7 +39,8 @@ def model_status(request: Request):
         threat_model=t.model_version, threat_calibration=t.calibration_status,
         threat_features=len(t.pipeline.columns_), anomaly_model=a.model_version, anomaly_detector=a.detector,
         anomaly_threshold=a.threshold, anomaly_features=len(a.pipeline.columns_),
-        campaign_mode=s.analysis.campaign.mode, campaign_limitations=s.analysis.campaign.limitations)
+        campaign_mode=s.analysis.campaign.mode, campaign_limitations=s.analysis.campaign.limitations,
+        defense_available=s.replay.defense_available, replay_input=s.replay_input)
 
 
 @router.get("/metrics")
@@ -132,6 +133,12 @@ def policy_configure(request: Request, body: PolicyConfigureRequest):
 @router.post("/policy/simulate")
 def policy_simulate(request: Request, body: PolicySimulateRequest):
     return state_of(request).simulate_policy(body.thresholds.model_dump(), body.max_examples)
+
+
+@router.get("/defense", response_model=DefenseState)
+def defense(request: Request, member_limit: int = Query(25, ge=0, le=5000), group_limit: int = Query(200, ge=1, le=5000)):
+    """Agents 4 and 5 from the current replay: correlation groups, policies, activation and expiry log."""
+    return state_of(request).defense_state(member_limit, group_limit)
 
 
 def _control(call):

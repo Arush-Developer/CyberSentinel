@@ -6,66 +6,7 @@ Setup is in the [README](../README.md#quick-start). Exact file lists are in [TEA
 
 ## Git workflow
 
-The folder is not yet a Git repository, and nothing has been committed for you. History should show what actually happened, so don't split this generated code into commits under other people's names.
-
-**Arush, once.** Create the repository with one honest first commit. Check that the staged list has no data, models or credentials. Replace `<repository-url>` with your own.
-
-```bash
-git init -b main
-```
-```bash
-git add .
-```
-```bash
-git status
-```
-```bash
-git commit -m "Initial integrated system generated with Claude Code from team brief"
-```
-```bash
-git remote add origin <repository-url>
-```
-```bash
-git push -u origin main
-```
-
-After Level 1 is submitted, keep the Day 1 checkpoint:
-
-```bash
-git tag day1-final
-```
-```bash
-git push origin day1-final
-```
-
-**Everyone.** Clone, then work on your own branch using your own Git identity. Use your branch name: `arush/backend`, `arpit/ml`, `arnav/intelligence`, `lucky/frontend-foundation` or `agrim/frontend-analytics`.
-
-```bash
-git switch -c arpit/ml
-```
-```bash
-git add backend/preprocessing backend/agents/threat_agent.py
-```
-```bash
-git commit -m "Describe what you actually changed and why"
-```
-```bash
-git push -u origin arpit/ml
-```
-
-**Integrating (Arush).** Review each branch, then merge it. Don't force-push `main`. Run the tests and the frontend build after each merge.
-
-```bash
-git switch main
-```
-```bash
-git pull
-```
-```bash
-git merge --no-ff arpit/ml
-```
-
-The models and dataset are not in Git. Everyone needs the ZIP in `data/raw/`, then runs `./scripts/run_all.sh`.
+See [GIT_WORKFLOW.md](GIT_WORKFLOW.md). Nothing has been committed for anyone, and the repair work is still uncommitted.
 
 ## Arush: backend and integration
 
@@ -154,3 +95,11 @@ With the backend running, check by hand: Attack Intelligence shows the hypothesi
 1. **Official submission API:** endpoint, auth and payload format.
 2. **Level 2 briefing:** due in the 6:00 to 8:00 PM slot.
 3. **Rule sheet wording:** the Day 1 heading says "Build Two Agents" but its table lists three. All three are built.
+
+## New since the first handoff
+
+- **Arush:** explain `DefenseLoop.step` and why a flow can never be blocked by a policy its own evidence created. Explain why replay and the export read Agents 1 to 3 evidence only. Run `scripts/rehearse_level2.py`, then read `tests/integration/test_level2.py::test_future_records_cannot_change_earlier_decisions`.
+- **Arnav:** explain `TemporalCorrelationAgent`, what a group is, and why anomaly-only groups never create a policy. Why does a source need a 60% attack share?
+- **Agrim:** walk a judge from a policy on Defence & Audit to its group on Attack Intelligence and to a blocked flow in the Workbench.
+- **Lucky:** run `npm --prefix frontend run test:e2e`, then explain what each browser test proves, and what it doesn't.
+- **Everyone:** the panel will ask about false blocks. A shared source that mostly sends benign traffic is protected by the attack-share rule, but benign flows from a blocked source are still blocked while the policy is active. That is the containment trade-off.

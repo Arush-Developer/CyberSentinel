@@ -7,3 +7,4 @@ PY="${PY:-.venv/bin/python}"
 "$PY" scripts/leakage_audit.py
 "$PY" scripts/calibrate_fusion.py
 "$PY" scripts/evaluate.py
+"$PY" scripts/rehearse_level2.py

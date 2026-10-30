@@ -35,7 +35,7 @@ export function CommandCenter() {
         <Stat label="Campaign hypotheses" value={fmt(replay.campaigns)} hint={`${fmt(replay.investigations)} investigations, ${fmt(replay.investigation_triggers)} triggers`} />
       </div>
       <AgentStatus />
-      <div className="grid lg:grid-cols-3 gap-3">
+      <div className={`grid gap-3 ${replay.defense_available ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
         <Panel title="Final class">
           <BarList items={CLASSES.map((name) => ({ label: name, value: c.classes[name] ?? 0, color: CLASS_COLOR[name] }))} total={Math.max(c.total, 1)} />
         </Panel>
@@ -49,6 +49,19 @@ export function CommandCenter() {
             ))}
           </div>
         </Panel>
+        {replay.defense_available && (
+          <Panel title="Agent 5 actions" hint="Replay actions from active policies">
+            <div className="space-y-3">
+              {(["ALLOW", "BLOCK"] as const).map((d) => (
+                <div key={d} className="flex items-center justify-between">
+                  <DecisionBadge decision={d} />
+                  <span className="num text-lg font-medium">{fmt(c.defense[d] ?? 0)}</span>
+                </div>
+              ))}
+              <p className="text-xs text-text-3">{fmt(replay.policies_activated)} policies activated, {fmt(replay.active_policies)} active, {fmt(replay.correlation_groups)} Agent 4 groups.</p>
+            </div>
+          </Panel>
+        )}
         <Panel title="Evidence status">
           {Object.keys(c.evidence).length ? (
             <BarList items={Object.entries(c.evidence).sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value }))} total={Math.max(c.total, 1)} />

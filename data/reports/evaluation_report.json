@@ -1,5 +1,312 @@
 {
   "partition": "eval",
+  "evaluation_modes": {
+    "rows": 114185,
+    "note": "All modes use the same official eval records. Mode C's batch view assigns a flow to a campaign using its whole window; mode_c_causal_replay is the strictly forward run.",
+    "mode_a_classifier_alone": {
+      "accuracy": 0.9999474536935674,
+      "macro_f1": 0.9998231651318518,
+      "balanced_accuracy": 0.9996870939367346,
+      "per_class_recall": {
+        "BENIGN": 0.9999500008333194,
+        "BRUTE_FORCE": 0.9985549132947977,
+        "DOS": 1.0,
+        "DDOS": 1.0,
+        "PORT_SCAN": 0.9999305555555555
+      },
+      "per_class_precision": {
+        "BENIGN": 0.9999500008333194,
+        "BRUTE_FORCE": 1.0,
+        "DOS": 0.9999166736105325,
+        "DDOS": 1.0,
+        "PORT_SCAN": 0.9999305555555555
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            59998,
+            0,
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            1382,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            24000,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            14400,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            14399
+          ]
+        ]
+      },
+      "false_positive_rate": 4.9999166680555324e-05,
+      "false_negative_rate": 5.536689797726266e-05,
+      "agent_agreement_rate": null,
+      "evidence_status_counts": null,
+      "policy": {
+        "counts": {
+          "ALLOW": 59995,
+          "BLOCK": 54166,
+          "REVIEW": 24
+        },
+        "attacks_blocked_rate": 0.9996677986121364,
+        "attacks_allowed_rate": 5.536689797726266e-05,
+        "attacks_reviewed_rate": 0.0002768344898863133,
+        "benign_allowed_rate": 0.9998500024999584,
+        "benign_blocked_rate": 0.0,
+        "benign_reviewed_rate": 0.00014999750004166597
+      },
+      "seconds": 0.063,
+      "latency_ms_per_1k_flows": 0.554
+    },
+    "mode_b_with_anomaly_and_fusion": {
+      "accuracy": 0.9999474536935674,
+      "macro_f1": 0.9998231651318518,
+      "balanced_accuracy": 0.9996870939367346,
+      "per_class_recall": {
+        "BENIGN": 0.9999500008333194,
+        "BRUTE_FORCE": 0.9985549132947977,
+        "DOS": 1.0,
+        "DDOS": 1.0,
+        "PORT_SCAN": 0.9999305555555555
+      },
+      "per_class_precision": {
+        "BENIGN": 0.9999500008333194,
+        "BRUTE_FORCE": 1.0,
+        "DOS": 0.9999166736105325,
+        "DDOS": 1.0,
+        "PORT_SCAN": 0.9999305555555555
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            59998,
+            0,
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            1382,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            24000,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            14400,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            14399
+          ]
+        ]
+      },
+      "false_positive_rate": 4.9999166680555324e-05,
+      "false_negative_rate": 5.536689797726266e-05,
+      "agent_agreement_rate": 0.7644699391338617,
+      "evidence_status_counts": {
+        "AGREED_BENIGN": 57000,
+        "ANOMALY_ONLY": 3001,
+        "CLASSIFIER_ONLY": 23893,
+        "MULTI_SIGNAL_ATTACK": 30290,
+        "UNCERTAIN": 1
+      },
+      "policy": {
+        "counts": {
+          "ALLOW": 56997,
+          "BLOCK": 54168,
+          "REVIEW": 3020
+        },
+        "attacks_blocked_rate": 0.9996862542447955,
+        "attacks_allowed_rate": 3.691126531817511e-05,
+        "attacks_reviewed_rate": 0.0002768344898863133,
+        "benign_allowed_rate": 0.9499008349860836,
+        "benign_blocked_rate": 1.666638889351844e-05,
+        "benign_reviewed_rate": 0.05008249862502292
+      },
+      "seconds": 0.493,
+      "latency_ms_per_1k_flows": 4.319
+    },
+    "mode_c_complete_system": {
+      "accuracy": 0.9999474536935674,
+      "macro_f1": 0.9998231651318518,
+      "balanced_accuracy": 0.9996870939367346,
+      "per_class_recall": {
+        "BENIGN": 0.9999500008333194,
+        "BRUTE_FORCE": 0.9985549132947977,
+        "DOS": 1.0,
+        "DDOS": 1.0,
+        "PORT_SCAN": 0.9999305555555555
+      },
+      "per_class_precision": {
+        "BENIGN": 0.9999500008333194,
+        "BRUTE_FORCE": 1.0,
+        "DOS": 0.9999166736105325,
+        "DDOS": 1.0,
+        "PORT_SCAN": 0.9999305555555555
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            59998,
+            0,
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            1382,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            24000,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            14400,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            14399
+          ]
+        ]
+      },
+      "false_positive_rate": 4.9999166680555324e-05,
+      "false_negative_rate": 5.536689797726266e-05,
+      "agent_agreement_rate": 0.7644699391338617,
+      "evidence_status_counts": {
+        "AGREED_BENIGN": 52042,
+        "ANOMALY_ONLY": 3001,
+        "CAMPAIGN_CORROBORATED": 23632,
+        "CAMPAIGN_ONLY": 4958,
+        "CLASSIFIER_ONLY": 261,
+        "MULTI_SIGNAL_ATTACK": 30290,
+        "UNCERTAIN": 1
+      },
+      "policy": {
+        "counts": {
+          "ALLOW": 52039,
+          "BLOCK": 54141,
+          "REVIEW": 8005
+        },
+        "attacks_blocked_rate": 0.9991879521630002,
+        "attacks_allowed_rate": 1.8455632659087555e-05,
+        "attacks_reviewed_rate": 0.0007935922043407648,
+        "benign_allowed_rate": 0.8672855452409126,
+        "benign_blocked_rate": 1.666638889351844e-05,
+        "benign_reviewed_rate": 0.13269778837019383
+      },
+      "seconds": 4.686,
+      "latency_ms_per_1k_flows": 41.042,
+      "investigation_coverage": {
+        "triggered": 32468,
+        "investigated": 32468,
+        "share_of_flows": 0.28434557954197137,
+        "verdicts": {
+          "SUPPORTS_ATTACK": 26277,
+          "CONFLICTING": 6191
+        }
+      },
+      "campaign_grouping": {
+        "campaigns": 27,
+        "flows_in_a_campaign": 59709
+      }
+    },
+    "mode_c_causal_replay": {
+      "status": "completed",
+      "rows": 114185,
+      "macro_f1": 0.9998231651318518,
+      "accuracy": 0.9999474536935674,
+      "policy": {
+        "counts": {
+          "ALLOW": 52008,
+          "BLOCK": 54141,
+          "REVIEW": 8036
+        },
+        "attacks_blocked_rate": 0.9991879521630002,
+        "attacks_allowed_rate": 1.8455632659087555e-05,
+        "attacks_reviewed_rate": 0.0007935922043407648,
+        "benign_allowed_rate": 0.8667688871852136,
+        "benign_blocked_rate": 1.666638889351844e-05,
+        "benign_reviewed_rate": 0.1332144464258929
+      },
+      "campaigns": 15,
+      "investigations_run": 575,
+      "investigation_triggers": 32499,
+      "replay_analysis_flows_per_second": 81740.8,
+      "wall_seconds_at_requested_100k_flows_per_second": 2.82
+    }
+  },
   "labels_used_for": "scoring only; no model or threshold was tuned on this partition",
   "model_version": "catboost-fit_selection-seed42-noport",
   "anomaly_version": "iforest-benign-seed42",
@@ -530,11 +837,13 @@
   },
   "agent_agreement_rate": 0.7644699391338617,
   "evidence_status_counts": {
-    "MULTI_SIGNAL_CONFIRMED": 53923,
     "AGREED_BENIGN": 52042,
-    "CAMPAIGN_ONLY": 5788,
-    "ANOMALY_ONLY": 2171,
-    "CLASSIFIER_ONLY": 261
+    "MULTI_SIGNAL_ATTACK": 30290,
+    "CAMPAIGN_CORROBORATED": 23632,
+    "CAMPAIGN_ONLY": 4958,
+    "ANOMALY_ONLY": 3001,
+    "CLASSIFIER_ONLY": 261,
+    "UNCERTAIN": 1
   },
   "policy": {
     "counts": {
@@ -602,13 +911,13 @@
       "SUPPORTS_ATTACK": 26277,
       "CONFLICTING": 6191
     },
-    "seconds": 4.0,
+    "seconds": 3.69,
     "conflicts_holding_decisions": 13
   },
   "latency": {
-    "agent1_ms_per_1k_flows": 0.5170257301694362,
-    "agent2_ms_per_1k_flows": 3.787131996414833,
-    "scoring_campaign_fusion_policy_flows_per_second": 124264.82409207495,
-    "investigation_seconds": 4.0
+    "agent1_ms_per_1k_flows": 0.5542288830252364,
+    "agent2_ms_per_1k_flows": 3.7643444146632277,
+    "scoring_campaign_fusion_policy_flows_per_second": 114595.361175408,
+    "investigation_seconds": 3.69
   }
 }

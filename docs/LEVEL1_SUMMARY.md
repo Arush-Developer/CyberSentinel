@@ -14,7 +14,9 @@ Measured values, from `data/reports/level1_summary.json`:
 >
 > **Agent 2 (anomaly):** Isolation Forest trained on benign flows only, independent of Agent 1. Returns a percentile score against held-out benign flows, with the most deviant features as evidence. ROC-AUC 0.884, recall 55.9% at a 5.0% false-positive rate. It detects DoS and DDoS well but sees few brute-force or port-scan flows.
 >
-> **Agent 3 (evidence fusion):** keeps final class, evidence status and rationale separate. The agents agreed on 76.4% of flows. Disagreements are handled explicitly: a benign call with a high anomaly score becomes ANOMALY_ONLY and goes to review, and an attack call with no support is CLASSIFIER_ONLY and needs a higher confidence to block. Evidence status counts: MULTI_SIGNAL_CONFIRMED 53,923; AGREED_BENIGN 52,042; CAMPAIGN_ONLY 5,788; ANOMALY_ONLY 2,171; CLASSIFIER_ONLY 261. Simulated decisions: ALLOW 52,039; BLOCK 54,141; REVIEW 8,005.
+> **Agent 3 (evidence fusion):** keeps final class, evidence status and rationale separate. The agents agreed on 76.4% of flows. Disagreements are handled explicitly: a benign call with a high anomaly score stays BENIGN, is marked ANOMALY_ONLY and goes to review; an attack call with no anomaly support is CLASSIFIER_ONLY and needs a higher confidence to block; a call below 0.60 confidence is UNCERTAIN and is never blocked. Evidence status counts: AGREED_BENIGN 57,000; MULTI_SIGNAL_ATTACK 30,290; CLASSIFIER_ONLY 23,893; ANOMALY_ONLY 3,001; UNCERTAIN 1. Simulated decisions: ALLOW 56,997; BLOCK 54,168; REVIEW 3,020.
+
+These figures are Agents 1 to 3 only. An earlier draft of this page mixed in campaign results, which belong to the later system. The accuracy and macro-F1 did not change; the status and decision counts did.
 
 ## How to submit
 

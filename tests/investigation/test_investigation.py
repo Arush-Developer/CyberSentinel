@@ -100,3 +100,16 @@ def test_conclusion_records_conflict():
     out = Orchestrator._conclude("I", "F", [], calls)
     assert out["verdict"] == VERDICT_CONFLICTING
     assert out["supporting_observations"] == ["a"] and out["contradicting_observations"] == ["b"]
+
+
+def test_audit_survives_a_restart_in_sqlite(tmp_path):
+    db = tmp_path / "audit.sqlite3"
+    first = AuditLog(db_path=db)
+    first.record("tool_call", tool="x")
+    last = first.record("policy_change", reason="tighter")
+    first.close()
+    second = AuditLog(db_path=db)
+    assert [e["kind"] for e in second.list()] == ["policy_change", "tool_call"]
+    assert second.record("system")["event_id"] == last["event_id"] + 1
+    second.close()
+
