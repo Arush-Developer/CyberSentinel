@@ -6,7 +6,7 @@ Setup is in the [README](../README.md#quick-start). Exact file lists are in [TEA
 
 ## Git workflow
 
-See [GIT_WORKFLOW.md](GIT_WORKFLOW.md). Nothing has been committed for anyone, and the repair work is still uncommitted.
+See [GIT_WORKFLOW.md](GIT_WORKFLOW.md). Nothing has been committed for anyone.
 
 ## Arush: backend and integration
 

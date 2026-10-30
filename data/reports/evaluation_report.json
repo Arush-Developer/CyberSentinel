@@ -84,8 +84,8 @@
         "benign_blocked_rate": 0.0,
         "benign_reviewed_rate": 0.00014999750004166597
       },
-      "seconds": 0.063,
-      "latency_ms_per_1k_flows": 0.554
+      "seconds": 0.038,
+      "latency_ms_per_1k_flows": 0.33
     },
     "mode_b_with_anomaly_and_fusion": {
       "accuracy": 0.9999474536935674,
@@ -174,8 +174,8 @@
         "benign_blocked_rate": 1.666638889351844e-05,
         "benign_reviewed_rate": 0.05008249862502292
       },
-      "seconds": 0.493,
-      "latency_ms_per_1k_flows": 4.319
+      "seconds": 0.459,
+      "latency_ms_per_1k_flows": 4.02
     },
     "mode_c_complete_system": {
       "accuracy": 0.9999474536935674,
@@ -266,8 +266,8 @@
         "benign_blocked_rate": 1.666638889351844e-05,
         "benign_reviewed_rate": 0.13269778837019383
       },
-      "seconds": 4.686,
-      "latency_ms_per_1k_flows": 41.042,
+      "seconds": 4.815,
+      "latency_ms_per_1k_flows": 42.167,
       "investigation_coverage": {
         "triggered": 32468,
         "investigated": 32468,
@@ -303,8 +303,8 @@
       "campaigns": 15,
       "investigations_run": 575,
       "investigation_triggers": 32499,
-      "replay_analysis_flows_per_second": 81740.8,
-      "wall_seconds_at_requested_100k_flows_per_second": 2.82
+      "replay_analysis_flows_per_second": 82078.8,
+      "wall_seconds_at_requested_100k_flows_per_second": 2.81
     }
   },
   "labels_used_for": "scoring only; no model or threshold was tuned on this partition",
@@ -911,13 +911,13 @@
       "SUPPORTS_ATTACK": 26277,
       "CONFLICTING": 6191
     },
-    "seconds": 3.69,
+    "seconds": 3.89,
     "conflicts_holding_decisions": 13
   },
   "latency": {
-    "agent1_ms_per_1k_flows": 0.5542288830252364,
-    "agent2_ms_per_1k_flows": 3.7643444146632277,
-    "scoring_campaign_fusion_policy_flows_per_second": 114595.361175408,
-    "investigation_seconds": 3.69
+    "agent1_ms_per_1k_flows": 0.32962735896646994,
+    "agent2_ms_per_1k_flows": 3.6907033150131583,
+    "scoring_campaign_fusion_policy_flows_per_second": 123465.28906981392,
+    "investigation_seconds": 3.89
   }
 }

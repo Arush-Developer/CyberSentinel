@@ -16,7 +16,7 @@ from dataclasses import asdict  # noqa: E402
 
 import numpy as np  # noqa: E402
 
-from backend.agents.fusion_agent import BENIGN, MULTI_SIGNAL_CONFIRMED, FusionConfig, fuse_batch  # noqa: E402
+from backend.agents.fusion_agent import BENIGN, MULTI_SIGNAL_ATTACK, FusionConfig, fuse_batch  # noqa: E402
 from backend.config import load_config, resolve  # noqa: E402
 from backend.evaluation.metrics import classification_report  # noqa: E402
 from backend.intelligence.campaign_engine import PACKET_RATE, CampaignConfig, fit_cohort_baseline  # noqa: E402
@@ -74,7 +74,7 @@ def main() -> None:
     truth_attack = y[tune] != BENIGN
     conf = fused.threat_confidence
     attack = fused.final_class != BENIGN
-    multi = fused.evidence_status == MULTI_SIGNAL_CONFIRMED
+    multi = fused.evidence_status == MULTI_SIGNAL_ATTACK
     clean_benign = ~attack & ~fused.is_anomaly
 
     allow = lowest_threshold(conf[clean_benign], ~truth_attack[clean_benign], ALLOW_TARGET, ALLOW_FLOOR)

@@ -32,3 +32,8 @@ def test_required_routes_are_registered():
                 ("GET", "/api/replay/events"), ("POST", "/api/policy/configure"), ("POST", "/api/policy/simulate"),
                 ("GET", "/api/defense")]
     assert not [r for r in required if r not in paths]
+
+
+@pytest.mark.parametrize("script", sorted(p.stem for p in Path(ROOT, "scripts").glob("*.py")))
+def test_script_imports(script):
+    importlib.import_module(f"scripts.{script}")

@@ -132,10 +132,10 @@ Files marked WORKING were checked by reading them and running their tests. The t
 | `frontend/src/investigations/IncidentTimeline.tsx` | Incident list | WORKING | Yes | None | types, ui | Agrim | None |
 | `frontend/src/investigations/InvestigationWorkbench.tsx` | Investigation page | PARTIALLY IMPLEMENTED | Partly | Did not show the replay action | EvidenceGraph, HypothesisPanel, api, types, ui | Agrim | Added |
 | `frontend/src/main.tsx` | React mount | WORKING | Yes | None | App | Lucky | None |
-| `frontend/src/pages/CommandCenter.tsx` | Command Centre page | PARTIALLY IMPLEMENTED | Partly | No Agent 5 actions | AgentStatus, IncidentTimeline, api, types, ui | Lucky | Added panel |
+| `frontend/src/pages/CommandCenter.tsx` | Command Centre page | PARTIALLY IMPLEMENTED | Partly | No Agent 5 actions | AgentStatus, IncidentTimeline, ReplayInputNotice, api, types, ui | Lucky | Added panel |
 | `frontend/src/replay/LiveFlowFeed.tsx` | Live table | PARTIALLY IMPLEMENTED | Partly | No Agent 5 column | types, ui | Lucky | Added |
 | `frontend/src/replay/ReplayControls.tsx` | Start, pause, resume, stop | WORKING | Yes | None | types, ui | Lucky | None |
-| `frontend/src/replay/ReplayLab.tsx` | Replay Lab page | PARTIALLY IMPLEMENTED | Partly | No policy activations | LiveFlowFeed, ReplayControls, ReplayTimeline, api, replay, types, ui | Lucky | Added |
+| `frontend/src/replay/ReplayLab.tsx` | Replay Lab page | PARTIALLY IMPLEMENTED | Partly | No policy activations | LiveFlowFeed, ReplayControls, ReplayInputNotice, ReplayTimeline, api, replay, types, ui | Lucky | Added |
 | `frontend/src/replay/ReplayTimeline.tsx` | Progress | WORKING | Yes | None | types, ui | Lucky | None |
 | `frontend/src/services/api.ts` | API client | WORKING | Yes | None | None internal | Lucky | None |
 | `frontend/src/services/replay.ts` | SSE hook | PARTIALLY IMPLEMENTED | Partly | Ignored policy events | types | Lucky | Added |
