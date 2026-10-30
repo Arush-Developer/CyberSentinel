@@ -1,0 +1,11 @@
+{
+  "fusion": {
+    "low_confidence": 0.6,
+    "benign_override_below": null
+  },
+  "policy": {
+    "allow_benign_confidence": 0.9,
+    "block_multi_signal_confidence": 0.9,
+    "block_classifier_only_confidence": 0.99
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "window_flows": 500,
+  "window_seconds": 60.0,
+  "ddos_min_sources": 10,
+  "dos_max_sources": 3,
+  "volume_min_flows": 30,
+  "volume_min_anomaly_share": 0.3,
+  "scan_min_ports": 20,
+  "scan_max_fwd_packets": 3,
+  "brute_min_flows": 5,
+  "service_ports": [
+    21,
+    22,
+    23,
+    25,
+    110,
+    143,
+    389,
+    445,
+    993,
+    995,
+    1433,
+    3306,
+    3389,
+    5900
+  ],
+  "cohort_scan_ports": 20.0,
+  "cohort_brute_flows": 19.0,
+  "benign_packet_rate_median": 64.12106323242188,
+  "benign_packet_rate_p99": 31496.0625
+}

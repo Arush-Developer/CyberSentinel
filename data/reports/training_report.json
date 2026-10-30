@@ -1,0 +1,904 @@
+{
+  "seed": 42,
+  "eval_partition_used": false,
+  "split_sizes": {
+    "fit": 319563,
+    "selection": 68569,
+    "calibration": 68605
+  },
+  "model_comparison_selection_split": {
+    "extra_trees": {
+      "rows": 68569,
+      "accuracy": 0.9999416646006213,
+      "macro_f1": 0.9998475026315322,
+      "balanced_accuracy": 0.9997173665841922,
+      "binary_attack_false_positive_rate": 0.0,
+      "binary_attack_false_negative_rate": 0.000122872765251582,
+      "per_class": {
+        "BENIGN": {
+          "precision": 0.9998889474999306,
+          "recall": 1.0,
+          "f1": 0.9999444706666296,
+          "support": 36015,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.000122872765251582
+        },
+        "BRUTE_FORCE": {
+          "precision": 1.0,
+          "recall": 0.9987951807228915,
+          "f1": 0.9993972272453285,
+          "support": 830,
+          "false_negative_rate": 0.001204819277108471,
+          "false_positive_rate": 0.0
+        },
+        "DOS": {
+          "precision": 1.0,
+          "recall": 0.9997916521980693,
+          "f1": 0.9998958152457024,
+          "support": 14399,
+          "false_negative_rate": 0.00020834780193068614,
+          "false_positive_rate": 0.0
+        },
+        "DDOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8640,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "PORT_SCAN": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8685,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            36015,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            829,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            14396,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8640,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            8685
+          ]
+        ]
+      },
+      "fit_seconds": 2.1,
+      "inference_ms_per_1k_flows": 0.77
+    },
+    "random_forest": {
+      "rows": 68569,
+      "accuracy": 0.9999416646006213,
+      "macro_f1": 0.9999565424147768,
+      "balanced_accuracy": 0.9999353022300571,
+      "binary_attack_false_positive_rate": 0.0,
+      "binary_attack_false_negative_rate": 0.000122872765251582,
+      "per_class": {
+        "BENIGN": {
+          "precision": 0.9998889474999306,
+          "recall": 1.0,
+          "f1": 0.9999444706666296,
+          "support": 36015,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.000122872765251582
+        },
+        "BRUTE_FORCE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 830,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "DOS": {
+          "precision": 1.0,
+          "recall": 0.9997916521980693,
+          "f1": 0.9998958152457024,
+          "support": 14399,
+          "false_negative_rate": 0.00020834780193068614,
+          "false_positive_rate": 0.0
+        },
+        "DDOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8640,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "PORT_SCAN": {
+          "precision": 1.0,
+          "recall": 0.9998848589522165,
+          "f1": 0.9999424261615522,
+          "support": 8685,
+          "false_negative_rate": 0.00011514104778354017,
+          "false_positive_rate": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            36015,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            830,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            14396,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8640,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            8684
+          ]
+        ]
+      },
+      "fit_seconds": 8.2,
+      "inference_ms_per_1k_flows": 0.57
+    },
+    "hist_gradient_boosting": {
+      "rows": 68569,
+      "accuracy": 0.9999708323003106,
+      "macro_f1": 0.9997537727172151,
+      "balanced_accuracy": 0.9999888935165903,
+      "binary_attack_false_positive_rate": 5.5532417048452037e-05,
+      "binary_attack_false_negative_rate": 0.0,
+      "per_class": {
+        "BENIGN": {
+          "precision": 1.0,
+          "recall": 0.9999444675829515,
+          "f1": 0.999972233020492,
+          "support": 36015,
+          "false_negative_rate": 5.553241704847611e-05,
+          "false_positive_rate": 0.0
+        },
+        "BRUTE_FORCE": {
+          "precision": 0.9975961538461539,
+          "recall": 1.0,
+          "f1": 0.9987966305655837,
+          "support": 830,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 2.9525088944330446e-05
+        },
+        "DOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 14399,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "DDOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8640,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "PORT_SCAN": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8685,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            36013,
+            2,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            830,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            14399,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8640,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            8685
+          ]
+        ]
+      },
+      "fit_seconds": 9.3,
+      "inference_ms_per_1k_flows": 2.98
+    },
+    "catboost": {
+      "rows": 68569,
+      "accuracy": 0.9999708323003106,
+      "macro_f1": 0.999980556904833,
+      "balanced_accuracy": 0.999980556904833,
+      "binary_attack_false_positive_rate": 2.7766208524226018e-05,
+      "binary_attack_false_negative_rate": 3.07181913128955e-05,
+      "per_class": {
+        "BENIGN": {
+          "precision": 0.9999722337914758,
+          "recall": 0.9999722337914758,
+          "f1": 0.9999722337914758,
+          "support": 36015,
+          "false_negative_rate": 2.7766208524182545e-05,
+          "false_positive_rate": 3.07181913128955e-05
+        },
+        "BRUTE_FORCE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 830,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "DOS": {
+          "precision": 0.9999305507326898,
+          "recall": 0.9999305507326898,
+          "f1": 0.9999305507326898,
+          "support": 14399,
+          "false_negative_rate": 6.944926731022871e-05,
+          "false_positive_rate": 1.846040243677312e-05
+        },
+        "DDOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8640,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "PORT_SCAN": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8685,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            36014,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            830,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            14398,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8640,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            8685
+          ]
+        ]
+      },
+      "fit_seconds": 105.7,
+      "inference_ms_per_1k_flows": 0.32
+    }
+  },
+  "selected_model": "catboost",
+  "destination_port_study": {
+    "with_port_macro_f1": 0.999980556904833,
+    "without_port": {
+      "rows": 68569,
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "balanced_accuracy": 1.0,
+      "binary_attack_false_positive_rate": 0.0,
+      "binary_attack_false_negative_rate": 0.0,
+      "per_class": {
+        "BENIGN": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 36015,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "BRUTE_FORCE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 830,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "DOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 14399,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "DDOS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8640,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        },
+        "PORT_SCAN": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8685,
+          "false_negative_rate": 0.0,
+          "false_positive_rate": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "BENIGN",
+          "BRUTE_FORCE",
+          "DOS",
+          "DDOS",
+          "PORT_SCAN"
+        ],
+        "rows_true_columns_predicted": [
+          [
+            36015,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            830,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            14399,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8640,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            8685
+          ]
+        ]
+      },
+      "fit_seconds": 105.8,
+      "inference_ms_per_1k_flows": 0.26
+    },
+    "macro_f1_gain": -1.9443095166993274e-05,
+    "required_gain": 0.001,
+    "use_port": false
+  },
+  "record_order_validation": {
+    "rows": 137021,
+    "accuracy": 0.996037103801607,
+    "macro_f1": 0.9972867257874837,
+    "balanced_accuracy": 0.9962624999999999,
+    "binary_attack_false_positive_rate": 0.00011111111111111112,
+    "binary_attack_false_negative_rate": 0.008228110918011105,
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.9926234367890578,
+        "recall": 0.9998888888888889,
+        "f1": 0.996242916548465,
+        "support": 72000,
+        "false_negative_rate": 0.00011111111111106187,
+        "false_positive_rate": 0.008228110918011105
+      },
+      "BRUTE_FORCE": {
+        "precision": 0.9993983152827918,
+        "recall": 1.0,
+        "f1": 0.9996990671080349,
+        "support": 1661,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 7.387706855791962e-06
+      },
+      "DOS": {
+        "precision": 0.9997877683845637,
+        "recall": 0.9814236111111111,
+        "f1": 0.9905205796288833,
+        "support": 28800,
+        "false_negative_rate": 0.018576388888888906,
+        "false_positive_rate": 5.544210458228995e-05
+      },
+      "DDOS": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 17280,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.0
+      },
+      "PORT_SCAN": {
+        "precision": 0.9999421329784156,
+        "recall": 1.0,
+        "f1": 0.9999710656520355,
+        "support": 17280,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 8.351358348435373e-06
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "BENIGN",
+        "BRUTE_FORCE",
+        "DOS",
+        "DDOS",
+        "PORT_SCAN"
+      ],
+      "rows_true_columns_predicted": [
+        [
+          71992,
+          1,
+          6,
+          0,
+          1
+        ],
+        [
+          0,
+          1661,
+          0,
+          0,
+          0
+        ],
+        [
+          535,
+          0,
+          28265,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          17280,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          17280
+        ]
+      ]
+    },
+    "fit_seconds": 120.1,
+    "inference_ms_per_1k_flows": 0.33
+  },
+  "threat_calibration_split": {
+    "rows": 68605,
+    "accuracy": 0.9999562714087894,
+    "macro_f1": 0.9998527894803626,
+    "balanced_accuracy": 0.9997398913318774,
+    "binary_attack_false_positive_rate": 2.7724638886578503e-05,
+    "binary_attack_false_negative_rate": 6.147037128104254e-05,
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.9999445522594954,
+        "recall": 0.9999722753611134,
+        "f1": 0.9999584136181539,
+        "support": 36069,
+        "false_negative_rate": 2.7724638886561515e-05,
+        "false_positive_rate": 6.147037128104254e-05
+      },
+      "BRUTE_FORCE": {
+        "precision": 1.0,
+        "recall": 0.9987966305655837,
+        "f1": 0.9993979530403372,
+        "support": 831,
+        "false_negative_rate": 0.001203369434416346,
+        "false_positive_rate": 0.0
+      },
+      "DOS": {
+        "precision": 1.0,
+        "recall": 0.9999305507326898,
+        "f1": 0.9999652741605028,
+        "support": 14399,
+        "false_negative_rate": 6.944926731022871e-05,
+        "false_positive_rate": 0.0
+      },
+      "DDOS": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 8640,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.0
+      },
+      "PORT_SCAN": {
+        "precision": 0.9998846198223146,
+        "recall": 1.0,
+        "f1": 0.9999423065828189,
+        "support": 8666,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 1.668362835549475e-05
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "BENIGN",
+        "BRUTE_FORCE",
+        "DOS",
+        "DDOS",
+        "PORT_SCAN"
+      ],
+      "rows_true_columns_predicted": [
+        [
+          36068,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          1,
+          830,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          14398,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          8640,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          8666
+        ]
+      ]
+    }
+  },
+  "calibration_study": {
+    "raw": {
+      "temperature": 1.0,
+      "ece_15_bins": 0.00013426283914965304,
+      "brier": 8.493085516701248e-05,
+      "nll": 0.00022809689207676457
+    },
+    "temperature_scaled": {
+      "temperature": 0.8,
+      "ece_15_bins": 4.821267866193968e-05,
+      "brier": 7.968525341336494e-05,
+      "nll": 0.00016825892913866964
+    },
+    "chosen_temperature": 0.8,
+    "rows_measured": 34303
+  },
+  "preprocessing": {
+    "threat_dropped": {
+      "Destination Port": "excluded",
+      "Fwd URG Flags": "constant in training",
+      "Bwd URG Flags": "constant in training",
+      "URG Flag Count": "constant in training",
+      "Average Packet Size": "duplicate of Packet Length Mean",
+      "Avg Fwd Segment Size": "duplicate of Fwd Packet Length Mean",
+      "Avg Bwd Segment Size": "duplicate of Bwd Packet Length Mean",
+      "Fwd Header Length_duplicated_0": "duplicate of Fwd Header Length"
+    },
+    "threat_features": 70
+  },
+  "feature_importance": [
+    {
+      "feature": "Subflow Fwd Bytes",
+      "importance": 16.88755053055751
+    },
+    {
+      "feature": "Bwd Packet Length Std",
+      "importance": 9.422013587959198
+    },
+    {
+      "feature": "Total Length of Fwd Packets",
+      "importance": 6.83446511242515
+    },
+    {
+      "feature": "Init_Win_bytes_backward",
+      "importance": 5.970215286970046
+    },
+    {
+      "feature": "Down/Up Ratio",
+      "importance": 5.016341743980581
+    },
+    {
+      "feature": "RST Flag Count",
+      "importance": 3.939404502524384
+    },
+    {
+      "feature": "Subflow Bwd Bytes",
+      "importance": 3.5862999582171957
+    },
+    {
+      "feature": "Fwd Packet Length Mean",
+      "importance": 3.480476641069097
+    },
+    {
+      "feature": "Init_Win_bytes_forward",
+      "importance": 2.6054166479956367
+    },
+    {
+      "feature": "Flow Duration",
+      "importance": 2.3852645510189685
+    },
+    {
+      "feature": "min_seg_size_forward",
+      "importance": 2.3056590248791062
+    },
+    {
+      "feature": "Fwd Packet Length Max",
+      "importance": 2.2643553434734476
+    },
+    {
+      "feature": "Fwd Packet Length Std",
+      "importance": 2.082256648027571
+    },
+    {
+      "feature": "Fwd Packets/s",
+      "importance": 1.9379320867876255
+    },
+    {
+      "feature": "Packet Length Mean",
+      "importance": 1.8974243082516724
+    },
+    {
+      "feature": "Bwd IAT Min",
+      "importance": 1.7536727321251275
+    },
+    {
+      "feature": "ACK Flag Count",
+      "importance": 1.5489068108319908
+    },
+    {
+      "feature": "Bwd Header Length",
+      "importance": 1.5346214636177014
+    },
+    {
+      "feature": "Flow Bytes/s",
+      "importance": 1.4795000117042778
+    },
+    {
+      "feature": "PSH Flag Count",
+      "importance": 1.4697902148051818
+    },
+    {
+      "feature": "Packet Length Std",
+      "importance": 1.3294250534499794
+    },
+    {
+      "feature": "Bwd Packets/s",
+      "importance": 1.2500177734337625
+    },
+    {
+      "feature": "Bwd IAT Mean",
+      "importance": 1.2406537398007949
+    },
+    {
+      "feature": "Packet Length Variance",
+      "importance": 1.2399717488774118
+    },
+    {
+      "feature": "Fwd Header Length",
+      "importance": 1.2381302149104176
+    }
+  ],
+  "anomaly": {
+    "benign_fit_rows": 167916,
+    "benign_calibration_rows": 36069,
+    "target_false_positive_rate": 0.05,
+    "threshold": 0.95,
+    "detector_comparison_selection_split": {
+      "isolation_forest": {
+        "rows": 68569,
+        "roc_auc": 0.8828586722418115,
+        "pr_auc": 0.8234394120510828,
+        "attack_prevalence": 0.4747626478437778,
+        "recall": 0.5569208085027954,
+        "false_positive_rate": 0.04970151325836457,
+        "precision": 0.910140562248996
+      },
+      "robust_deviation": {
+        "rows": 68569,
+        "roc_auc": 0.6800194955391496,
+        "pr_auc": 0.603074469399337,
+        "attack_prevalence": 0.4747626478437778,
+        "recall": 0.0,
+        "false_positive_rate": 0.0,
+        "precision": null
+      },
+      "combined": {
+        "rows": 68569,
+        "roc_auc": 0.8494923434001918,
+        "pr_auc": 0.80289383139431,
+        "attack_prevalence": 0.4747626478437778,
+        "recall": 0.5585795908336917,
+        "false_positive_rate": 0.04934055254754963,
+        "precision": 0.9109764039877761
+      }
+    },
+    "selected_detector": "isolation_forest",
+    "per_class_recall_at_threshold": {
+      "BENIGN": 0.04970151325836457,
+      "BRUTE_FORCE": 0.0,
+      "DOS": 0.725953191193833,
+      "DDOS": 0.8850694444444445,
+      "PORT_SCAN": 0.0034542314335060447
+    },
+    "threshold_curve": [
+      {
+        "threshold": 0.8,
+        "recall": 0.7262701972107882,
+        "false_positive_rate": 0.19822296265444952
+      },
+      {
+        "threshold": 0.9,
+        "recall": 0.7024635989432942,
+        "false_positive_rate": 0.09890323476329307
+      },
+      {
+        "threshold": 0.95,
+        "recall": 0.5569208085027954,
+        "false_positive_rate": 0.04970151325836457
+      },
+      {
+        "threshold": 0.98,
+        "recall": 0.09581003870492105,
+        "false_positive_rate": 0.019408579758433984
+      },
+      {
+        "threshold": 0.99,
+        "recall": 0.01050562142901026,
+        "false_positive_rate": 0.009773705400527558
+      }
+    ],
+    "features_used": 70
+  }
+}

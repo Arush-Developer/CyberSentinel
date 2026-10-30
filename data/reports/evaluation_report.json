@@ -1,0 +1,614 @@
+{
+  "partition": "eval",
+  "labels_used_for": "scoring only; no model or threshold was tuned on this partition",
+  "model_version": "catboost-fit_selection-seed42-noport",
+  "anomaly_version": "iforest-benign-seed42",
+  "anomaly_detector": "isolation_forest",
+  "fusion_config": {
+    "low_confidence": 0.6,
+    "benign_override_below": null
+  },
+  "policy_thresholds": {
+    "allow_benign_confidence": 0.9,
+    "block_multi_signal_confidence": 0.9,
+    "block_classifier_only_confidence": 0.99
+  },
+  "agent1": {
+    "rows": 114185,
+    "accuracy": 0.9999474536935674,
+    "macro_f1": 0.9998231651318518,
+    "balanced_accuracy": 0.9996870939367346,
+    "binary_attack_false_positive_rate": 4.9999166680555324e-05,
+    "binary_attack_false_negative_rate": 5.536689797726266e-05,
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.9999500008333194,
+        "recall": 0.9999500008333194,
+        "f1": 0.9999500008333194,
+        "support": 60001,
+        "false_negative_rate": 4.999916668058102e-05,
+        "false_positive_rate": 5.536689797726266e-05
+      },
+      "BRUTE_FORCE": {
+        "precision": 1.0,
+        "recall": 0.9985549132947977,
+        "f1": 0.9992769342010123,
+        "support": 1384,
+        "false_negative_rate": 0.0014450867052022698,
+        "false_positive_rate": 0.0
+      },
+      "DOS": {
+        "precision": 0.9999166736105325,
+        "recall": 1.0,
+        "f1": 0.9999583350693722,
+        "support": 24000,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 2.217663691301214e-05
+      },
+      "DDOS": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 14400,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.0
+      },
+      "PORT_SCAN": {
+        "precision": 0.9999305555555555,
+        "recall": 0.9999305555555555,
+        "f1": 0.9999305555555555,
+        "support": 14400,
+        "false_negative_rate": 6.94444444444553e-05,
+        "false_positive_rate": 1.0021546324597885e-05
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "BENIGN",
+        "BRUTE_FORCE",
+        "DOS",
+        "DDOS",
+        "PORT_SCAN"
+      ],
+      "rows_true_columns_predicted": [
+        [
+          59998,
+          0,
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          1382,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          24000,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          14400,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          14399
+        ]
+      ]
+    }
+  },
+  "agent1_excluding_rows_also_in_training": {
+    "rows": 104390,
+    "accuracy": 0.9999425232301945,
+    "macro_f1": 0.9998134096138918,
+    "balanced_accuracy": 0.9996773634919075,
+    "binary_attack_false_positive_rate": 5.362697079117658e-05,
+    "binary_attack_false_negative_rate": 6.19220607661823e-05,
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.9999463730292089,
+        "recall": 0.9999463730292089,
+        "f1": 0.9999463730292089,
+        "support": 55942,
+        "false_negative_rate": 5.362697079114298e-05,
+        "false_positive_rate": 6.19220607661823e-05
+      },
+      "BRUTE_FORCE": {
+        "precision": 1.0,
+        "recall": 0.9985549132947977,
+        "f1": 0.9992769342010123,
+        "support": 1384,
+        "false_negative_rate": 0.0014450867052022698,
+        "false_positive_rate": 0.0
+      },
+      "DOS": {
+        "precision": 0.9999164229001254,
+        "recall": 1.0,
+        "f1": 0.9999582097037067,
+        "support": 23928,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 2.485645397827546e-05
+      },
+      "DDOS": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 14400,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.0
+      },
+      "PORT_SCAN": {
+        "precision": 0.9998855311355311,
+        "recall": 0.9998855311355311,
+        "f1": 0.9998855311355311,
+        "support": 8736,
+        "false_negative_rate": 0.00011446886446886406,
+        "false_positive_rate": 1.0454345871578816e-05
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "BENIGN",
+        "BRUTE_FORCE",
+        "DOS",
+        "DDOS",
+        "PORT_SCAN"
+      ],
+      "rows_true_columns_predicted": [
+        [
+          55939,
+          0,
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          1382,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          23928,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          14400,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          8735
+        ]
+      ]
+    },
+    "excluded_rows": 9795
+  },
+  "agent2": {
+    "rows": 114185,
+    "roc_auc": 0.8844509404406723,
+    "pr_auc": 0.825657443548279,
+    "attack_prevalence": 0.47452817795682445,
+    "recall": 0.559021113243762,
+    "false_positive_rate": 0.05003249945834236,
+    "precision": 0.9098281869518202,
+    "per_class_flag_rate": {
+      "BENIGN": 0.05003249945834236,
+      "BRUTE_FORCE": 0.000722543352601156,
+      "DOS": 0.7257083333333333,
+      "DDOS": 0.8903472222222222,
+      "PORT_SCAN": 0.0035416666666666665
+    },
+    "threshold_curve": [
+      {
+        "threshold": 0.8,
+        "recall": 0.7267274472168906,
+        "false_positive_rate": 0.19754670755487408
+      },
+      {
+        "threshold": 0.9,
+        "recall": 0.703639450760372,
+        "false_positive_rate": 0.0975150414159764
+      },
+      {
+        "threshold": 0.95,
+        "recall": 0.559021113243762,
+        "false_positive_rate": 0.05003249945834236
+      },
+      {
+        "threshold": 0.98,
+        "recall": 0.09772257492986859,
+        "false_positive_rate": 0.018616356394060098
+      },
+      {
+        "threshold": 0.99,
+        "recall": 0.011202569024066146,
+        "false_positive_rate": 0.00961650639156014
+      }
+    ],
+    "score_histogram_by_class": {
+      "BENIGN": [
+        3110,
+        2877,
+        3134,
+        2920,
+        3026,
+        2935,
+        2951,
+        3085,
+        3130,
+        2916,
+        2871,
+        3017,
+        2879,
+        3187,
+        3050,
+        3060,
+        2987,
+        3015,
+        2849,
+        3002
+      ],
+      "BRUTE_FORCE": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        2,
+        812,
+        547,
+        18,
+        1,
+        1
+      ],
+      "DOS": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        60,
+        10,
+        4,
+        27,
+        10,
+        220,
+        6251,
+        17417
+      ],
+      "DDOS": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        1,
+        63,
+        1513,
+        12821
+      ],
+      "PORT_SCAN": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        132,
+        5787,
+        670,
+        6133,
+        1164,
+        316,
+        76,
+        71,
+        51
+      ]
+    }
+  },
+  "system": {
+    "rows": 114185,
+    "accuracy": 0.9999474536935674,
+    "macro_f1": 0.9998231651318518,
+    "balanced_accuracy": 0.9996870939367346,
+    "binary_attack_false_positive_rate": 4.9999166680555324e-05,
+    "binary_attack_false_negative_rate": 5.536689797726266e-05,
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.9999500008333194,
+        "recall": 0.9999500008333194,
+        "f1": 0.9999500008333194,
+        "support": 60001,
+        "false_negative_rate": 4.999916668058102e-05,
+        "false_positive_rate": 5.536689797726266e-05
+      },
+      "BRUTE_FORCE": {
+        "precision": 1.0,
+        "recall": 0.9985549132947977,
+        "f1": 0.9992769342010123,
+        "support": 1384,
+        "false_negative_rate": 0.0014450867052022698,
+        "false_positive_rate": 0.0
+      },
+      "DOS": {
+        "precision": 0.9999166736105325,
+        "recall": 1.0,
+        "f1": 0.9999583350693722,
+        "support": 24000,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 2.217663691301214e-05
+      },
+      "DDOS": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 14400,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.0
+      },
+      "PORT_SCAN": {
+        "precision": 0.9999305555555555,
+        "recall": 0.9999305555555555,
+        "f1": 0.9999305555555555,
+        "support": 14400,
+        "false_negative_rate": 6.94444444444553e-05,
+        "false_positive_rate": 1.0021546324597885e-05
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "BENIGN",
+        "BRUTE_FORCE",
+        "DOS",
+        "DDOS",
+        "PORT_SCAN"
+      ],
+      "rows_true_columns_predicted": [
+        [
+          59998,
+          0,
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          1382,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          24000,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          14400,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          14399
+        ]
+      ]
+    }
+  },
+  "ablation": {
+    "agent1_alone": {
+      "macro_f1": 0.9998231651318518,
+      "accuracy": 0.9999474536935674,
+      "policy": {
+        "counts": {
+          "ALLOW": 59995,
+          "BLOCK": 54166,
+          "REVIEW": 24
+        },
+        "attacks_blocked_rate": 0.9996677986121364,
+        "attacks_allowed_rate": 5.536689797726266e-05,
+        "attacks_reviewed_rate": 0.0002768344898863133,
+        "benign_allowed_rate": 0.9998500024999584,
+        "benign_blocked_rate": 0.0,
+        "benign_reviewed_rate": 0.00014999750004166597
+      }
+    },
+    "agent1_plus_agent2": {
+      "macro_f1": 0.9998231651318518,
+      "accuracy": 0.9999474536935674,
+      "policy": {
+        "counts": {
+          "ALLOW": 56997,
+          "BLOCK": 54168,
+          "REVIEW": 3020
+        },
+        "attacks_blocked_rate": 0.9996862542447955,
+        "attacks_allowed_rate": 3.691126531817511e-05,
+        "attacks_reviewed_rate": 0.0002768344898863133,
+        "benign_allowed_rate": 0.9499008349860836,
+        "benign_blocked_rate": 1.666638889351844e-05,
+        "benign_reviewed_rate": 0.05008249862502292
+      }
+    },
+    "plus_campaign_intelligence": {
+      "macro_f1": 0.9998231651318518,
+      "accuracy": 0.9999474536935674,
+      "policy": {
+        "counts": {
+          "ALLOW": 52039,
+          "BLOCK": 54141,
+          "REVIEW": 8005
+        },
+        "attacks_blocked_rate": 0.9991879521630002,
+        "attacks_allowed_rate": 1.8455632659087555e-05,
+        "attacks_reviewed_rate": 0.0007935922043407648,
+        "benign_allowed_rate": 0.8672855452409126,
+        "benign_blocked_rate": 1.666638889351844e-05,
+        "benign_reviewed_rate": 0.13269778837019383
+      }
+    },
+    "plus_investigation": {
+      "macro_f1": 0.9998231651318518,
+      "accuracy": 0.9999474536935674,
+      "policy": {
+        "counts": {
+          "ALLOW": 52039,
+          "BLOCK": 54141,
+          "REVIEW": 8005
+        },
+        "attacks_blocked_rate": 0.9991879521630002,
+        "attacks_allowed_rate": 1.8455632659087555e-05,
+        "attacks_reviewed_rate": 0.0007935922043407648,
+        "benign_allowed_rate": 0.8672855452409126,
+        "benign_blocked_rate": 1.666638889351844e-05,
+        "benign_reviewed_rate": 0.13269778837019383
+      }
+    },
+    "note": "Agent 2, campaigns and investigation change evidence and policy routing. They change final_class only if the benign override passed internal validation."
+  },
+  "agent_agreement_rate": 0.7644699391338617,
+  "evidence_status_counts": {
+    "MULTI_SIGNAL_CONFIRMED": 53923,
+    "AGREED_BENIGN": 52042,
+    "CAMPAIGN_ONLY": 5788,
+    "ANOMALY_ONLY": 2171,
+    "CLASSIFIER_ONLY": 261
+  },
+  "policy": {
+    "counts": {
+      "ALLOW": 52039,
+      "BLOCK": 54141,
+      "REVIEW": 8005
+    },
+    "attacks_blocked_rate": 0.9991879521630002,
+    "attacks_allowed_rate": 1.8455632659087555e-05,
+    "attacks_reviewed_rate": 0.0007935922043407648,
+    "benign_allowed_rate": 0.8672855452409126,
+    "benign_blocked_rate": 1.666638889351844e-05,
+    "benign_reviewed_rate": 0.13269778837019383
+  },
+  "policy_rule_counts": {
+    "CONFIDENT_ATTACK_WITH_INDEPENDENT_SUPPORT": 53912,
+    "CONFIDENT_BENIGN_NO_OTHER_SIGNAL": 52039,
+    "CAMPAIGN_ONLY_NEEDS_REVIEW": 5780,
+    "ANOMALY_ONLY_NEEDS_REVIEW": 2167,
+    "VERY_CONFIDENT_CLASSIFIER_ONLY": 229,
+    "UNRESOLVED_CONFLICT": 52,
+    "ATTACK_BELOW_BLOCK_THRESHOLD": 3,
+    "BENIGN_BELOW_ALLOW_THRESHOLD": 3
+  },
+  "campaign_intelligence": {
+    "mode": "cohort",
+    "limitations": [
+      "source and destination addresses are absent from this partition, so source diversity, destination concentration and host counts cannot be measured",
+      "DoS and DDoS cannot be separated without source addresses; both report as VOLUMETRIC_CANDIDATE",
+      "record order stands in for time and is not verified chronology"
+    ],
+    "total_campaigns": 27,
+    "per_type": {
+      "BRUTE_FORCE_CANDIDATE": {
+        "campaigns": 7,
+        "member_flows": 1386,
+        "member_share_of_matching_class": 0.9264069264069265,
+        "member_share_benign": 0.0735930735930736
+      },
+      "PORT_SCAN_CANDIDATE": {
+        "campaigns": 1,
+        "member_flows": 14361,
+        "member_share_of_matching_class": 0.9915047698628229,
+        "member_share_benign": 0.008495230137177076
+      },
+      "VOLUMETRIC_CANDIDATE": {
+        "campaigns": 19,
+        "member_flows": 43962,
+        "member_share_of_matching_class": 0.8725945134434284,
+        "member_share_benign": 0.12651835676265866
+      }
+    },
+    "share_of_each_class_in_a_campaign": {
+      "BENIGN": 0.0964317261378977,
+      "BRUTE_FORCE": 0.9277456647398844,
+      "DDOS": 1.0,
+      "DOS": 0.998375,
+      "PORT_SCAN": 0.9915277777777778
+    }
+  },
+  "investigation": {
+    "triggered": 32468,
+    "investigated": 32468,
+    "verdicts": {
+      "SUPPORTS_ATTACK": 26277,
+      "CONFLICTING": 6191
+    },
+    "seconds": 4.0,
+    "conflicts_holding_decisions": 13
+  },
+  "latency": {
+    "agent1_ms_per_1k_flows": 0.5170257301694362,
+    "agent2_ms_per_1k_flows": 3.787131996414833,
+    "scoring_campaign_fusion_policy_flows_per_second": 124264.82409207495,
+    "investigation_seconds": 4.0
+  }
+}

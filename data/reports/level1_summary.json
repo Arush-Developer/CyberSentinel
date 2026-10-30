@@ -1,0 +1,34 @@
+{
+  "track": "Cyber",
+  "level": 1,
+  "partition": "eval",
+  "rows": 114185,
+  "accuracy": 0.9999474536935674,
+  "macro_f1": 0.9998231651318518,
+  "agent1": {
+    "accuracy": 0.9999474536935674,
+    "macro_f1": 0.9998231651318518,
+    "model": "catboost-fit_selection-seed42-noport"
+  },
+  "agent2": {
+    "roc_auc": 0.8844509404406723,
+    "pr_auc": 0.825657443548279,
+    "recall": 0.559021113243762,
+    "false_positive_rate": 0.05003249945834236
+  },
+  "agent3": {
+    "agreement_rate": 0.7644699391338617,
+    "evidence_status_counts": {
+      "MULTI_SIGNAL_CONFIRMED": 53923,
+      "AGREED_BENIGN": 52042,
+      "CAMPAIGN_ONLY": 5788,
+      "ANOMALY_ONLY": 2171,
+      "CLASSIFIER_ONLY": 261
+    },
+    "policy_counts": {
+      "ALLOW": 52039,
+      "BLOCK": 54141,
+      "REVIEW": 8005
+    }
+  }
+}

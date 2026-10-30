@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body { background: #0a101c; color: #e8edf5; font-size: 13px; -webkit-font-smoothing: antialiased; }
+* { scrollbar-width: thin; scrollbar-color: #33445f transparent; }
+.num { font-variant-numeric: tabular-nums; }
+th { font-weight: 500; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid #38bdf8; outline-offset: 2px;
+}
+.react-flow__attribution { display: none; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

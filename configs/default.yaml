@@ -1,0 +1,29 @@
+# CyberSentinel X configuration. Paths are relative to the repository root.
+data:
+  # The organisers' file is cyber-pack.zip; the brief's official_dataset.zip name is also accepted.
+  archive: data/raw/cyber-pack.zip
+  archive_alternate: data/raw/official_dataset.zip
+  extracted_dir: data/extracted
+  processed_dir: data/processed
+  reports_dir: data/reports
+  training_parquet: data/extracted/Cyber/training/flows.parquet
+  eval_parquet: data/extracted/Cyber/eval/flows.parquet
+  id_column: record_id
+  label_column: label
+  # Absent from the participant pack; README says they ship with the hidden set.
+  metadata_columns: [source_ip, destination_ip, source_port, destination_port, protocol, timestamp, seq]
+
+models:
+  threat: models/threat_model/threat_agent.joblib
+  anomaly: models/anomaly_model/anomaly_agent.joblib
+
+labels:
+  classes: [BENIGN, BRUTE_FORCE, DOS, DDOS, PORT_SCAN]
+  # The pack's labels are already the five benchmark classes (verified by the profiler),
+  # so the mapping is an explicit identity. Anything else is reported, never coerced.
+  mapping:
+    BENIGN: BENIGN
+    BRUTE_FORCE: BRUTE_FORCE
+    DOS: DOS
+    DDOS: DDOS
+    PORT_SCAN: PORT_SCAN

@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "api", "runtimeExecutable": ".venv/bin/uvicorn", "runtimeArgs": ["backend.main:app", "--port", "8000"], "port": 8000 },
+    { "name": "web", "runtimeExecutable": "node", "runtimeArgs": ["frontend/node_modules/vite/bin/vite.js", "frontend", "--host", "127.0.0.1"], "port": 5173, "url": "http://127.0.0.1:5173" }
+  ]
+}

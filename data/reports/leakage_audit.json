@@ -1,0 +1,317 @@
+{
+  "split": "fit vs selection, training partition only",
+  "top_single_features_depth4_tree": [
+    [
+      "Bwd Header Length",
+      0.9054430596485806
+    ],
+    [
+      "Fwd Header Length",
+      0.8112397609344935
+    ],
+    [
+      "Fwd Packet Length Max",
+      0.7620021769020751
+    ],
+    [
+      "Packet Length Mean",
+      0.7508186255794687
+    ],
+    [
+      "ACK Flag Count",
+      0.7485264254291479
+    ],
+    [
+      "Bwd IAT Max",
+      0.7425822434336998
+    ],
+    [
+      "Total Length of Fwd Packets",
+      0.731785413738131
+    ],
+    [
+      "Bwd Packet Length Max",
+      0.7294758145682181
+    ],
+    [
+      "Flow IAT Max",
+      0.6909851501609819
+    ],
+    [
+      "Subflow Fwd Bytes",
+      0.6783334433495509
+    ],
+    [
+      "Max Packet Length",
+      0.6727211667937082
+    ],
+    [
+      "Fwd Packet Length Mean",
+      0.6687386851981116
+    ],
+    [
+      "Bwd IAT Total",
+      0.6658994882874429
+    ],
+    [
+      "Init_Win_bytes_backward",
+      0.6520760378857063
+    ],
+    [
+      "Fwd IAT Max",
+      0.6514744114507763
+    ]
+  ],
+  "tree_depth_vs_macro_f1": {
+    "1": {
+      "macro_f1": 0.20965738219808633,
+      "per_class": {
+        "BENIGN": 0.0,
+        "BRUTE_FORCE": 0.820969337289812,
+        "DDOS": 0.22731757370061959,
+        "DOS": 0.0,
+        "PORT_SCAN": 0.0
+      }
+    },
+    "2": {
+      "macro_f1": 0.4432027229167697,
+      "per_class": {
+        "BENIGN": 0.0,
+        "BRUTE_FORCE": 0.9987966305655837,
+        "DDOS": 0.2575951820160401,
+        "DOS": 0.0,
+        "PORT_SCAN": 0.9596218020022247
+      }
+    },
+    "3": {
+      "macro_f1": 0.7076795840871981,
+      "per_class": {
+        "BENIGN": 0.9906322861912449,
+        "BRUTE_FORCE": 0.9993979530403372,
+        "DDOS": 0.5520636849004125,
+        "DOS": 0.0,
+        "PORT_SCAN": 0.9963039963039964
+      }
+    },
+    "4": {
+      "macro_f1": 0.9927829832252082,
+      "per_class": {
+        "BENIGN": 0.9903064284419153,
+        "BRUTE_FORCE": 0.9993979530403372,
+        "DDOS": 0.9994212293089478,
+        "DOS": 0.978312262308562,
+        "PORT_SCAN": 0.9964770430262778
+      }
+    },
+    "6": {
+      "macro_f1": 0.9972732839917597,
+      "per_class": {
+        "BENIGN": 0.9969318765531507,
+        "BRUTE_FORCE": 1.0,
+        "DDOS": 0.9996526571726294,
+        "DOS": 0.9944448302201236,
+        "PORT_SCAN": 0.995337056012895
+      }
+    },
+    "8": {
+      "macro_f1": 0.9990901127088565,
+      "per_class": {
+        "BENIGN": 0.9989177188844179,
+        "BRUTE_FORCE": 1.0,
+        "DDOS": 0.9996526571726294,
+        "DOS": 0.9984370115661144,
+        "PORT_SCAN": 0.9984431759211209
+      }
+    }
+  },
+  "depth3_rules": "|--- Destination Port <= 22.50\n|   |--- Bwd IAT Std <= 323568.80\n|   |   |--- Flow Duration <= 18875.00\n|   |   |   |--- class: PORT_SCAN\n|   |   |--- Flow Duration >  18875.00\n|   |   |   |--- class: BENIGN\n|   |--- Bwd IAT Std >  323568.80\n|   |   |--- PSH Flag Count <= 43.50\n|   |   |   |--- class: BRUTE_FORCE\n|   |   |--- PSH Flag Count >  43.50\n|   |   |   |--- class: BENIGN\n|--- Destination Port >  22.50\n|   |--- Flow Duration <= 126.50\n|   |   |--- Init_Win_bytes_forward <= 865.00\n|   |   |   |--- class: BENIGN\n|   |   |--- Init_Win_bytes_forward >  865.00\n|   |   |   |--- class: PORT_SCAN\n|   |--- Flow Duration >  126.50\n|   |   |--- Bwd Packet Length Std <= 1300.11\n|   |   |   |--- class: BENIGN\n|   |   |--- Bwd Packet Length Std >  1300.11\n|   |   |   |--- class: DDOS\n",
+  "cumulative_top_feature_knockout": [
+    {
+      "removed": 0,
+      "last_removed": "none",
+      "macro_f1": 0.9995643316828637
+    },
+    {
+      "removed": 1,
+      "last_removed": "Bwd Header Length",
+      "macro_f1": 0.9995837736199998
+    },
+    {
+      "removed": 2,
+      "last_removed": "Fwd Header Length",
+      "macro_f1": 0.9995837736199998
+    },
+    {
+      "removed": 3,
+      "last_removed": "Fwd Packet Length Max",
+      "macro_f1": 0.9995792048638649
+    },
+    {
+      "removed": 4,
+      "last_removed": "Packet Length Mean",
+      "macro_f1": 0.9995792048638649
+    },
+    {
+      "removed": 5,
+      "last_removed": "ACK Flag Count",
+      "macro_f1": 0.9995792048638649
+    },
+    {
+      "removed": 6,
+      "last_removed": "Bwd IAT Max",
+      "macro_f1": 0.9995837736199998
+    },
+    {
+      "removed": 7,
+      "last_removed": "Total Length of Fwd Packets",
+      "macro_f1": 0.9995837736199998
+    },
+    {
+      "removed": 8,
+      "last_removed": "Bwd Packet Length Max",
+      "macro_f1": 0.9995837736199998
+    },
+    {
+      "removed": 9,
+      "last_removed": "Flow IAT Max",
+      "macro_f1": 0.9995837736199998
+    },
+    {
+      "removed": 10,
+      "last_removed": "Subflow Fwd Bytes",
+      "macro_f1": 0.9995934951962839
+    },
+    {
+      "removed": 11,
+      "last_removed": "Max Packet Length",
+      "macro_f1": 0.9995934951962839
+    },
+    {
+      "removed": 12,
+      "last_removed": "Fwd Packet Length Mean",
+      "macro_f1": 0.9995737031500994
+    },
+    {
+      "removed": 13,
+      "last_removed": "Bwd IAT Total",
+      "macro_f1": 0.9995450624461266
+    },
+    {
+      "removed": 14,
+      "last_removed": "Init_Win_bytes_backward",
+      "macro_f1": 0.9995542598611481
+    },
+    {
+      "removed": 15,
+      "last_removed": "Fwd IAT Max",
+      "macro_f1": 0.9995112034816357
+    },
+    {
+      "removed": 16,
+      "last_removed": "Destination Port",
+      "macro_f1": 0.9997575149125743
+    },
+    {
+      "removed": 17,
+      "last_removed": "Flow Duration",
+      "macro_f1": 0.9997472750534818
+    },
+    {
+      "removed": 18,
+      "last_removed": "Bwd IAT Mean",
+      "macro_f1": 0.9997519676568413
+    },
+    {
+      "removed": 19,
+      "last_removed": "Flow Packets/s",
+      "macro_f1": 0.9997329849529715
+    },
+    {
+      "removed": 20,
+      "last_removed": "Bwd Packet Length Mean",
+      "macro_f1": 0.9996956026252196
+    },
+    {
+      "removed": 21,
+      "last_removed": "Flow Bytes/s",
+      "macro_f1": 0.9997237804044093
+    },
+    {
+      "removed": 22,
+      "last_removed": "Packet Length Std",
+      "macro_f1": 0.9997237804044093
+    },
+    {
+      "removed": 23,
+      "last_removed": "Packet Length Variance",
+      "macro_f1": 0.9997432248124232
+    },
+    {
+      "removed": 24,
+      "last_removed": "Fwd IAT Total",
+      "macro_f1": 0.9995960185743579
+    },
+    {
+      "removed": 25,
+      "last_removed": "Total Length of Bwd Packets",
+      "macro_f1": 0.9996297613522845
+    }
+  ],
+  "per_class_profile": {
+    "BENIGN": {
+      "rows": 240000,
+      "unique_feature_rows": 229647,
+      "ports": 878,
+      "median_flow_duration": 61874.0,
+      "median_init_win_fwd": 0.0,
+      "init_win_fwd_unique": 1530,
+      "median_init_win_bwd": 0.0,
+      "init_win_bwd_unique": 4235,
+      "median_fwd_packets": 2.0
+    },
+    "BRUTE_FORCE": {
+      "rows": 5537,
+      "unique_feature_rows": 5537,
+      "ports": 2,
+      "median_flow_duration": 9671393.0,
+      "median_init_win_fwd": 29200.0,
+      "init_win_fwd_unique": 1,
+      "median_init_win_bwd": 0.0,
+      "init_win_bwd_unique": 7,
+      "median_fwd_packets": 11.0
+    },
+    "DDOS": {
+      "rows": 57600,
+      "unique_feature_rows": 57600,
+      "ports": 1,
+      "median_flow_duration": 6507763.5,
+      "median_init_win_fwd": 8192.0,
+      "init_win_fwd_unique": 2,
+      "median_init_win_bwd": 229.0,
+      "init_win_bwd_unique": 1,
+      "median_fwd_packets": 8.0
+    },
+    "DOS": {
+      "rows": 96000,
+      "unique_feature_rows": 95793,
+      "ports": 1,
+      "median_flow_duration": 164979.0,
+      "median_init_win_fwd": 29200.0,
+      "init_win_fwd_unique": 3,
+      "median_init_win_bwd": 235.0,
+      "init_win_bwd_unique": 9,
+      "median_fwd_packets": 8.0
+    },
+    "PORT_SCAN": {
+      "rows": 57600,
+      "unique_feature_rows": 44028,
+      "ports": 1000,
+      "median_flow_duration": 48.0,
+      "median_init_win_fwd": 29200.0,
+      "init_win_fwd_unique": 4,
+      "median_init_win_bwd": 0.0,
+      "init_win_bwd_unique": 5,
+      "median_fwd_packets": 1.0
+    }
+  }
+}

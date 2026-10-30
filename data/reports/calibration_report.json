@@ -1,0 +1,85 @@
+{
+  "eval_partition_used": false,
+  "calibration_rows": {
+    "tune": 34302,
+    "verify": 34303
+  },
+  "benign_override": {
+    "macro_f1_without_tune": 0.9997245325047383,
+    "trials_tune": {
+      "0.55": 0.9997245325047383,
+      "0.6": 0.9997245325047383,
+      "0.7": 0.9997245325047383,
+      "0.8": 0.9997245325047383,
+      "0.9": 0.9997245325047383,
+      "0.95": 0.9999713393449561,
+      "0.99": 0.9999713393449561
+    },
+    "best_threshold": 0.95,
+    "macro_f1_gain_verify": 0.0,
+    "required_gain": 0.0002,
+    "enabled": false
+  },
+  "policy_threshold_selection_tune_half": {
+    "allow": {
+      "target_precision": 0.999,
+      "threshold": 0.9,
+      "precision": 1.0,
+      "flows": 17141
+    },
+    "block_multi": {
+      "target_precision": 0.995,
+      "threshold": 0.9,
+      "precision": 1.0,
+      "flows": 9139
+    },
+    "block_classifier_only": {
+      "target_precision": 0.999,
+      "threshold": 0.99,
+      "precision": 1.0,
+      "flows": 7147
+    }
+  },
+  "calibrated": {
+    "fusion": {
+      "low_confidence": 0.6,
+      "benign_override_below": null
+    },
+    "policy": {
+      "allow_benign_confidence": 0.9,
+      "block_multi_signal_confidence": 0.9,
+      "block_classifier_only_confidence": 0.99
+    }
+  },
+  "campaign_baseline": {
+    "window_flows": 500,
+    "window_seconds": 60.0,
+    "ddos_min_sources": 10,
+    "dos_max_sources": 3,
+    "volume_min_flows": 30,
+    "volume_min_anomaly_share": 0.3,
+    "scan_min_ports": 20,
+    "scan_max_fwd_packets": 3,
+    "brute_min_flows": 5,
+    "service_ports": [
+      21,
+      22,
+      23,
+      25,
+      110,
+      143,
+      389,
+      445,
+      993,
+      995,
+      1433,
+      3306,
+      3389,
+      5900
+    ],
+    "cohort_scan_ports": 20.0,
+    "cohort_brute_flows": 19.0,
+    "benign_packet_rate_median": 64.12106323242188,
+    "benign_packet_rate_p99": 31496.0625
+  }
+}

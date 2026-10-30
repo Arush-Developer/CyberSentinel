@@ -1,0 +1,16 @@
+# Dataset and derived data are never committed.
+data/raw/
+data/extracted/
+data/processed/
+models/**/*.joblib
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+frontend/dist/
+.env
+.env.*
+configs/submission.yaml
+.DS_Store
+*.log
