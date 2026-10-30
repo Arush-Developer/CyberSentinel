@@ -14,7 +14,7 @@ export function AuditLogs() {
   const [kind, setKind] = useState("");
   const audit = useApi<{ total: number; items: AuditEvent[] }>(`/audit?limit=60${kind ? `&kind=${kind}` : ""}`, 3000);
   return (
-    <Panel title="Audit log" hint={audit.data ? `${fmt(audit.data.total)} events recorded since the backend started` : undefined}
+    <Panel title="Audit log" hint={audit.data ? `${fmt(audit.data.total)} events recorded` : undefined}
       actions={
         <select aria-label="Filter audit events" value={kind} onChange={(e) => setKind(e.target.value)} className="bg-ink-800 border border-ink-600 rounded-md px-2 py-1 text-xs">
           {AUDIT_KINDS.map((k) => <option key={k} value={k}>{k || "All events"}</option>)}

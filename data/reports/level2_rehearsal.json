@@ -3,15 +3,15 @@
   "assignment": "one source per attack class, 30 sources for DDoS, 2% of benign flows share an attacker address",
   "rows": 114185,
   "rule_violations": [],
-  "policies": 54,
-  "correlation_groups": 2337,
-  "attack_flows_blocked_share": 0.9966779861213643,
-  "benign_flows_blocked_share": 0.013199780003666605,
-  "benign_flows_blocked": 792,
+  "policies": 164,
+  "correlation_groups": 2453,
+  "attack_flows_blocked_share": 0.9925808356710468,
+  "benign_flows_blocked_share": 0.005416576390393494,
+  "benign_flows_blocked": 325,
   "attack_blocked_share_by_class": {
-    "BRUTE_FORCE": 0.9559248554913294,
-    "DDOS": 0.9949305555555555,
-    "DOS": 0.999875,
-    "PORT_SCAN": 0.9970138888888889
+    "BRUTE_FORCE": 0.971820809248555,
+    "DDOS": 0.9784027777777777,
+    "DOS": 0.999125,
+    "PORT_SCAN": 0.9978472222222222
   }
 }

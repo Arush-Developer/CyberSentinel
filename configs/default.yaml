@@ -40,7 +40,7 @@ level2:
     min_confidence: 0.90
     min_attack_flows_multi_signal: 3
     min_attack_flows_classifier_only: 5
-    min_attack_flows_converging: 1
+    min_attack_flows_converging: 2
     min_attack_share: 0.60
     ttl_records: 2000
     max_ttl_records: 16000

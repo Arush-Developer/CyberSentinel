@@ -109,7 +109,7 @@ test("what-if simulation calls the backend and changes nothing until applied", a
   await page.getByRole("button", { name: "Simulate what-if" }).click();
   await expect(page.getByText(/changed|No decisions change/i).first()).toBeVisible({ timeout: 15_000 });
   expect((await (await request.get("/api/policy")).json()).thresholds).toEqual(before);
-  await expect(page.getByText(/policy_simulation/).first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator("td").getByText("policy_simulation", { exact: true }).first()).toBeVisible({ timeout: 15_000 });
 });
 
 test("agents 4 and 5 report their real state", async ({ page, request }) => {
@@ -119,6 +119,10 @@ test("agents 4 and 5 report their real state", async ({ page, request }) => {
     await expect(page.getByText("Off for this input")).toBeVisible();
     await expect(page.getByText(/need source_ip/)).toBeVisible();
     return;
+  }
+  if (models.replay_input.includes("rehearsal")) {
+    await page.goto("/command");
+    await expect(page.getByText("Rehearsal input with invented addresses")).toBeVisible();
   }
   await request.post("/api/replay/start", { data: { speed: 100000, batch_size: 1000, max_investigations_per_batch: 1 } });
   await expect.poll(async () => (await (await request.get("/api/replay/status")).json()).status, { timeout: 60_000 }).toBe("completed");

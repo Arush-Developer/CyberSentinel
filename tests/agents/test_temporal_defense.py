@@ -117,9 +117,22 @@ def test_port_scan_pattern_is_named_from_observed_ports():
     assert run.temporal.source_evidence("1.1.1.1")["pattern"] == "one source touching many destination ports"
 
 
+def test_one_attack_call_at_a_converging_destination_is_not_enough_by_default():
+    assert DefenseConfig().min_attack_flows_converging >= 2
+
+
 def test_finish_closes_policies_still_active():
     run = loop(ttl_records=1000)
     for i in range(3):
         attack(run, i)
     run.finish(2, "R2")
     assert run.defense.policies[0]["expires_after_record_id"] == "R2"
+
+
+def test_missing_source_addresses_are_never_grouped_or_blocked():
+    run = loop()
+    for i in range(20):
+        result = attack(run, i, src="nan")
+        assert result["action"] == ALLOW and result["activated_policy"] is None
+    assert not run.defense.policies and not run.temporal.groups
+

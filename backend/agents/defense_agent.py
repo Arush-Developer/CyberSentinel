@@ -17,6 +17,7 @@ from backend.agents.fusion_agent import MULTI_SIGNAL_ATTACK
 from backend.agents.temporal_agent import TemporalConfig, TemporalCorrelationAgent
 
 ALLOW, BLOCK = "ALLOW", "BLOCK"
+MISSING_ADDRESSES = {"", "nan", "none", "nat", "<na>"}
 
 
 @dataclass
@@ -24,7 +25,7 @@ class DefenseConfig:
     min_confidence: float = 0.90  # Agent 1 confidence for a flow to count towards, or trigger, a policy.
     min_attack_flows_multi_signal: int = 3  # When the triggering flow also has Agent 2 support.
     min_attack_flows_classifier_only: int = 5  # Agent 2 barely sees brute force or port scans.
-    min_attack_flows_converging: int = 1  # Source joins a many-to-one pattern already seen.
+    min_attack_flows_converging: int = 2  # Source joins a many-to-one pattern already seen.
     min_attack_share: float = 0.60  # Protects shared sources that mostly send benign traffic.
     ttl_records: int = 2000
     max_ttl_records: int = 16000
@@ -141,9 +142,11 @@ class DefenseLoop:
     def step(self, position: int, record_id: str, source: str, destination: str, port: float | None,
              predicted_class: str, confidence: float, anomaly_score: float, is_anomaly: bool,
              evidence_status: str) -> dict:
-        blocking = self.defense.apply_active(position, record_id, source)
+        # A flow with no usable source cannot match a policy or be attributed. It must not become one big "source".
+        known_source = source.strip().lower() not in MISSING_ADDRESSES
+        blocking = self.defense.apply_active(position, record_id, source) if known_source else None
         activated = None
-        if blocking is None:
+        if blocking is None and known_source:
             group = self.temporal.observe(position, record_id, source, destination, port, predicted_class,
                                           confidence, is_anomaly)
             activated = self.defense.consider(position, record_id, source, destination, predicted_class, confidence,

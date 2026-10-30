@@ -33,8 +33,9 @@ def synthetic_endpoints(labels: pd.Series, seed: int = 7) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     n = len(labels)
     benign_hosts = np.array([f"10.20.{i // 250}.{i % 250 + 1}" for i in range(400)])
-    source = rng.choice(benign_hosts, n)
-    destination = rng.choice([f"192.0.2.{i}" for i in range(1, 41)], n)
+    # Object arrays: a fixed-width string array would silently cut longer addresses when they are assigned.
+    source = rng.choice(benign_hosts, n).astype(object)
+    destination = rng.choice([f"192.0.2.{i}" for i in range(1, 41)], n).astype(object)
     attackers = {"BRUTE_FORCE": ["198.51.100.10"], "DOS": ["198.51.100.20"], "PORT_SCAN": ["198.51.100.30"],
                  "DDOS": [f"203.0.113.{i}" for i in range(1, 31)]}
     victims = {"BRUTE_FORCE": "192.0.2.100", "DOS": "192.0.2.101", "PORT_SCAN": "192.0.2.102", "DDOS": "192.0.2.103"}

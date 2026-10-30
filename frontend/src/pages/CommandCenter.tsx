@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { AgentStatus } from "../components/AgentStatus";
 import { BarList, CLASS_COLOR, ClassTag, DecisionBadge, Empty, Notice, Page, Panel, Stat, fmt, pct } from "../components/ui";
+import { ReplayInputNotice } from "../replay/ReplayInputNotice";
 import { IncidentTimeline } from "../investigations/IncidentTimeline";
 import { useApi } from "../services/api";
 import { CLASSES, type Incident, type ReplayStatus } from "../services/types";
@@ -10,6 +11,7 @@ interface Summary {
   incidents: { scope: string; total: number; items: Incident[] };
   campaign_mode: string;
   limitations: string[];
+  replay_input: string;
 }
 
 export function CommandCenter() {
@@ -22,7 +24,8 @@ export function CommandCenter() {
   const disagree = c.agreement.DISAGREE ?? 0;
 
   return (
-    <Page title="Command Centre" subtitle="Live totals from the current replay of the official validation records. Decisions are simulated.">
+    <Page title="Command Centre" subtitle={`Live totals from the current replay of ${data.replay_input}. Decisions are simulated.`}>
+      <ReplayInputNotice input={data.replay_input} />
       {replay.cursor === 0 && (
         <Notice tone="info" title="No replay has run yet">
           Counts stay at zero until flows are replayed. <Link className="underline text-accent" to="/replay">Open Replay Lab</Link> to start one.

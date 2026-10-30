@@ -3,13 +3,15 @@ import { Link } from "react-router-dom";
 import { BarList, CLASS_COLOR, Empty, Notice, Page, Panel, Stat, Tag, fmt } from "../components/ui";
 import { post, useApi } from "../services/api";
 import { useReplayStream } from "../services/replay";
-import { CLASSES, type ReplayStatus } from "../services/types";
+import { CLASSES, type ModelStatus, type ReplayStatus } from "../services/types";
 import { LiveFlowFeed } from "./LiveFlowFeed";
 import { ReplayControls } from "./ReplayControls";
+import { ReplayInputNotice } from "./ReplayInputNotice";
 import { ReplayTimeline } from "./ReplayTimeline";
 
 export function ReplayLab() {
   const { data: status, error, reload } = useApi<ReplayStatus>("/replay/status", 700);
+  const { data: models } = useApi<ModelStatus>("/models/status");
   const stream = useReplayStream();
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -24,7 +26,8 @@ export function ReplayLab() {
   };
 
   return (
-    <Page title="Replay Lab" subtitle="Streams the real validation records through the full pipeline in record order. No traffic is generated and nothing touches a network.">
+    <Page title="Replay Lab" subtitle={`Streams ${models?.replay_input ?? "the supplied records"} through the full pipeline in the supplied order. No traffic is generated and nothing touches a network.`}>
+      {models && <ReplayInputNotice input={models.replay_input} />}
       {(error || problem) && <Notice tone="crit" title="Replay request failed">{problem ?? error}</Notice>}
       {status?.campaign_mode === "cohort" && (
         <Notice tone="info" title="Record order stands in for time">The pack has no timestamps or sequence numbers, so flows replay in record_id order. This is not verified chronology.</Notice>

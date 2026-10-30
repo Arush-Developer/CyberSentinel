@@ -169,6 +169,14 @@ def test_replay_tools_cannot_see_later_records(pipeline, run):
     assert analysis.store.rank_of[analysis.store.neighbours(row, 100)].max() > anchor
 
 
+def test_synthetic_addresses_are_kept_whole():
+    labels = pd.Series(["BENIGN"] * 50 + ["DOS", "PORT_SCAN", "BRUTE_FORCE", "DDOS"] * 10)
+    endpoints = synthetic_endpoints(labels)
+    assert set(endpoints["source_ip"][labels == "DOS"]) == {"198.51.100.20"}
+    assert set(endpoints["source_ip"][labels == "PORT_SCAN"]) == {"198.51.100.30"}
+    assert set(endpoints["destination_ip"][labels == "DDOS"]) == {"192.0.2.103"}
+
+
 def test_partition_helper_keeps_endpoints_out_of_model_features(run):
     partition, _ = run
     assert isinstance(partition, Partition)

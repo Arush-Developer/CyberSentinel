@@ -150,7 +150,9 @@ class AppState:
         if position is None or position >= len(frame):
             return None
         r = frame.iloc[position]
-        return {"action": r["defense_action"], "applied_policy_id": r["applied_policy_id"] or None,
+        applied = r["applied_policy_id"]
+        return {"action": None if pd.isna(r["defense_action"]) else r["defense_action"],
+                "applied_policy_id": None if pd.isna(applied) or not applied else applied,
                 "replay_decision": r["policy_decision"], "replay_evidence_status": r["evidence_status"]}
 
     def defense_state(self, member_limit: int = 25, group_limit: int = 200) -> dict:
@@ -293,7 +295,7 @@ class AppState:
     def summary(self) -> dict:
         snapshot = self.replay.snapshot()
         scope = self.resolve_scope(None)
-        return {"replay": snapshot, "incidents": self.incidents(scope, limit=8),
+        return {"replay": snapshot, "incidents": self.incidents(scope, limit=8), "replay_input": self.replay_input,
                 "campaign_mode": self.analysis.campaign.mode,
                 "limitations": self.analysis.campaign.limitations}
 
