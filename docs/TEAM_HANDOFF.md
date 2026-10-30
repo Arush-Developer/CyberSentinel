@@ -2,14 +2,16 @@
 
 Every member must be able to explain their modules. Work through your section: read the code, run the commands, and be ready for the questions. Your own improvements go in as your own commits.
 
-Setup for everyone is in the [README](../README.md#quick-start).
+Setup is in the [README](../README.md#quick-start). Exact file lists are in [TEAM_OWNERSHIP.md](TEAM_OWNERSHIP.md).
 
-## First: Git (Arush)
+## Git workflow
 
-The folder is not yet a Git repository, and nothing has been committed for you. History should show what actually happened, so don't split this generated code into commits under other people's names. A single first commit with an honest message is the accurate record. Check the staged list contains no data, models or credentials before committing.
+The folder is not yet a Git repository, and nothing has been committed for you. History should show what actually happened, so don't split this generated code into commits under other people's names.
+
+**Arush, once.** Create the repository with one honest first commit. Check that the staged list has no data, models or credentials. Replace `<repository-url>` with your own.
 
 ```bash
-git init
+git init -b main
 ```
 ```bash
 git add .
@@ -20,19 +22,57 @@ git status
 ```bash
 git commit -m "Initial integrated system generated with Claude Code from team brief"
 ```
+```bash
+git remote add origin <repository-url>
+```
+```bash
+git push -u origin main
+```
 
 After Level 1 is submitted, keep the Day 1 checkpoint:
 
 ```bash
 git tag day1-final
 ```
+```bash
+git push origin day1-final
+```
 
-## Arush: architecture and backend
-
-**Files:** see [TEAM_OWNERSHIP.md](TEAM_OWNERSHIP.md).
+**Everyone.** Clone, then work on your own branch using your own Git identity. Use your branch name: `arush/backend`, `arpit/ml`, `arnav/intelligence`, `lucky/frontend-foundation` or `agrim/frontend-analytics`.
 
 ```bash
-.venv/bin/python -m pytest tests/test_fusion_policy.py tests/test_api_replay.py -v
+git switch -c arpit/ml
+```
+```bash
+git add backend/preprocessing backend/agents/threat_agent.py
+```
+```bash
+git commit -m "Describe what you actually changed and why"
+```
+```bash
+git push -u origin arpit/ml
+```
+
+**Integrating (Arush).** Review each branch, then merge it. Don't force-push `main`. Run the tests and the frontend build after each merge.
+
+```bash
+git switch main
+```
+```bash
+git pull
+```
+```bash
+git merge --no-ff arpit/ml
+```
+
+The models and dataset are not in Git. Everyone needs the ZIP in `data/raw/`, then runs `./scripts/run_all.sh`.
+
+## Arush: backend and integration
+
+**Review first:** `services/model_service.py` (how everything is run), `agents/fusion_agent.py`, `policy/policy_engine.py`, `replay/replay_engine.py`, `schemas/contracts.py`.
+
+```bash
+.venv/bin/python -m pytest tests/agents/test_fusion.py tests/policy tests/replay tests/api tests/integration -v
 ```
 ```bash
 .venv/bin/python scripts/calibrate_fusion.py
@@ -40,61 +80,74 @@ git tag day1-final
 
 **Do next:** submit Level 1 ([LEVEL1_SUMMARY.md](LEVEL1_SUMMARY.md)). Read the Level 2 briefing.
 
-**Be ready to explain:** why evidence types aren't averaged; why fusion leaves `final_class` alone; what the ablation table shows; how Stop reaches a running investigation; why decisions are simulated only.
+**Understand before committing:** why evidence types aren't averaged; why fusion leaves `final_class` alone; what the ablation table shows; how Stop reaches a running investigation; why decisions are simulated only.
 
 ## Arpit: data and supervised ML
 
+**Review first:** `preprocessing/data_processor.py`, `agents/threat_agent.py`, `scripts/train_models.py`, `data/reports/dataset_profile.json`, `data/reports/leakage_audit.json`.
+
+```bash
+.venv/bin/python -m pytest tests/agents/test_preprocessing.py tests/agents/test_agents.py -v
+```
 ```bash
 .venv/bin/python scripts/profile_dataset.py
 ```
 ```bash
-.venv/bin/python scripts/train_models.py
-```
-```bash
 .venv/bin/python scripts/leakage_audit.py
 ```
-```bash
-.venv/bin/python -m pytest tests/test_preprocessing.py -v
-```
 
-**Do next:** look at the 6 misclassified validation flows in `data/processed/eval_predictions.parquet`. Investigate why DoS recall falls to 0.981 on the record-order split, since it's the best available clue about generalisation.
-
-**Be ready to explain:** why the score is so high and why that isn't leakage; why `record_id` and `Destination Port` are out; why splits are grouped; what temperature scaling did and that it can't change the predicted class.
-
-## Arnav: anomaly and campaigns
+Retrain only with a reason, because it replaces the saved models:
 
 ```bash
-.venv/bin/python -m pytest tests/test_campaign_investigation.py tests/test_submission_and_agents.py -v
+.venv/bin/python scripts/train_models.py
 ```
 
-Then inspect `agent2` and `campaign_intelligence` in `data/reports/evaluation_report.json`.
+**Do next:** look at the 6 misclassified validation flows in `data/processed/eval_predictions.parquet`. Investigate why DoS recall falls to 0.981 on the record-order split; it's the best available clue about generalisation.
 
-**Do next:** Agent 2 almost never flags brute force or port scans, which is its biggest weakness. Try improving it, selecting on internal splits only. `robust_deviation` got 0 recall at its threshold, probably because many benign flows hit the z-score cap and tie; that's worth fixing. Check endpoint-mode thresholds on the hidden set's metadata when it arrives.
+**Understand before committing:** why the score is so high and why that isn't leakage; why `record_id` and `Destination Port` are out; why splits are grouped; what temperature scaling did and why it can't change the predicted class.
 
-**Be ready to explain:** what the anomaly score means and why it isn't a probability; how Agent 2 stays independent; what cohort mode can't claim; why brute-force records are only behavioural indicators; why 12.7% of volumetric campaign members are benign.
+## Arnav: anomaly and security intelligence
+
+**Review first:** `agents/anomaly_agent.py`, `intelligence/feature_explainer.py`, `intelligence/campaign_engine.py`, `investigation/tools.py`, `investigation/registry.py`. Then read `agent2` and `campaign_intelligence` in `data/reports/evaluation_report.json`.
+
+```bash
+.venv/bin/python -m pytest tests/intelligence tests/investigation tests/agents/test_agents.py -v
+```
+
+**Do next:** Agent 2 almost never flags brute force or port scans, which is its biggest weakness. Try improving it, selecting on internal splits only. `robust_deviation` got 0 recall at its threshold, probably because many benign flows hit the z-score cap and tie. Check endpoint-mode thresholds when the hidden set's metadata arrives.
+
+**Understand before committing:** what the anomaly score means and why it isn't a probability; how Agent 2 stays independent; what cohort mode can't claim; why brute-force records are only behavioural indicators; why 12.7% of volumetric campaign members are benign; why `RobustBaseline` must stay importable from `anomaly_agent.py`.
 
 ## Lucky: frontend foundation
 
+**Review first:** `app/router.tsx`, `components/Layout.tsx`, `services/api.ts`, `services/replay.ts`, `replay/ReplayLab.tsx`.
+
+```bash
+npm --prefix frontend run build
+```
 ```bash
 npm --prefix frontend run dev
 ```
+
+With the backend running, check by hand: Command Centre shows agent cards and live counts; start, pause, resume and stop a replay; the top-bar STOP works from any screen; stop the backend and confirm the page says so; check a narrow window.
+
+**Do next:** there are no automated frontend tests, so adding some would help. Review keyboard use.
+
+**Understand before committing:** how the SSE stream reaches the page and why rendering is throttled; why counts come from polling rather than the feed; what `Layout` does while models load.
+
+## Agrim: analytics and investigation
+
+**Review first:** `analytics/ThreatAnalytics.tsx`, `analytics/ModelMetrics.tsx`, `investigations/InvestigationWorkbench.tsx`, `evidence-graph/EvidenceGraph.tsx`, `audit/PolicyControls.tsx`.
+
 ```bash
 npm --prefix frontend run build
 ```
 
-With the backend running, check the Command Centre and Replay Lab. Start, pause, resume and stop a replay, and confirm the sidebar STOP works from any screen. Check narrow widths.
+With the backend running, check by hand: Attack Intelligence shows the hypothesis, contradicting evidence and relationships; the Workbench shows real tool calls and the graph; Model Intelligence matches `data/reports/evaluation_report.json`; simulate a threshold change, apply it, confirm it in the audit log, then reset it.
 
-**Do next:** there are no automated frontend tests, so adding some would help. Review keyboard use and the mobile layout.
+**Do next:** the graph uses a simple column layout, and labels get small on busy flows. The campaign graph will need rework when endpoint metadata arrives, to show sources and destinations.
 
-**Be ready to explain:** how the SSE stream reaches the page and why rendering is throttled; why counts come from polling rather than the feed; how the page behaves when the backend is down.
-
-## Agrim: intelligence screens
-
-With the backend running, go through Attack Intelligence, Investigation Workbench, Model Intelligence, and Defence & Audit. Simulate a threshold change, then apply and reset it, and confirm it appears in the audit log.
-
-**Do next:** the evidence graph layout is a simple column layout, and labels get small on busy flows. The Attack Intelligence graph will need rework when endpoint metadata arrives, to show sources and destinations.
-
-**Be ready to explain:** how the graph is built from real output; why the confusion matrix uses log shading; what the what-if mode does and doesn't change; why the screen warns that scores may not generalise.
+**Understand before committing:** how the graph is built from real output; why the confusion matrix uses log shading; what what-if mode does and doesn't change; why the screen warns that scores may not generalise.
 
 ## Open questions for Arush
 

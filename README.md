@@ -55,6 +55,12 @@ full detail is in `data/reports/evaluation_report.json`.
   Their value here is explanation and a second opinion rather than better scores. They may matter more
   on traffic the classifier has not seen, but that has not been measured.
 
+## Technology stack
+
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, Recharts, React Flow, Lucide
+- **Backend:** Python, FastAPI, Pydantic
+- **ML:** CatBoost, scikit-learn, pandas, NumPy, PyArrow
+
 ## Quick start
 
 Requires Python 3.12 and Node 20 or later. Put the organisers' ZIP at `data/raw/cyber-pack.zip`
@@ -70,7 +76,7 @@ Requires Python 3.12 and Node 20 or later. Put the organisers' ZIP at `data/raw/
 npm --prefix frontend ci
 ```
 
-Rebuild every model and report from the ZIP (about 7 minutes on a 10-core laptop):
+To train: rebuild every model and report from the ZIP (about 7 minutes on a 10-core laptop). This also extracts the dataset, so run it once after cloning:
 
 ```bash
 ./scripts/run_all.sh
@@ -88,13 +94,15 @@ In a second terminal, start the dashboard, then open http://localhost:5173:
 npm --prefix frontend run dev
 ```
 
+API documentation is at http://localhost:8000/docs and in [docs/API.md](docs/API.md).
+
 Run the tests:
 
 ```bash
 .venv/bin/python -m pytest -q
 ```
 
-Start a replay from the Replay Lab screen, or from the command line:
+Start a replay from the Replay Lab screen, where you can also pause, resume and stop it, or from the command line:
 
 ```bash
 curl -X POST localhost:8000/api/replay/start -H 'Content-Type: application/json' -d '{"speed": 2000}'
@@ -107,6 +115,8 @@ Score the hidden set when it is released (no submission is made):
 ```
 
 ## How it works
+
+The layout and who owns each module are in [docs/TEAM_OWNERSHIP.md](docs/TEAM_OWNERSHIP.md).
 
 ```
                  ┌─ Agent 1: CatBoost, 5 classes ──────────┐
@@ -171,4 +181,5 @@ Score the hidden set when it is released (no submission is made):
 - [Module contracts](docs/MODULE_CONTRACTS.md)
 - [Integration guide](docs/INTEGRATION_GUIDE.md)
 - [Implementation status](docs/IMPLEMENTATION_STATUS.md)
+- [Refactor audit](docs/REFACTOR_AUDIT.md)
 - [Level 1 summary](docs/LEVEL1_SUMMARY.md)

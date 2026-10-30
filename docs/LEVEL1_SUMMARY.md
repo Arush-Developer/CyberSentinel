@@ -36,13 +36,13 @@ The adapter refuses to send anything until it has the official format, and it do
 2. Preview the payload. This sends nothing:
 
    ```bash
-   .venv/bin/python -c "from backend.submission.level1_adapter import submit; import json; print(json.dumps(submit(dry_run=True), indent=2))"
+   .venv/bin/python -c "from backend.api.submission_adapter import submit; import json; print(json.dumps(submit(dry_run=True), indent=2))"
    ```
 
 3. Check it against the instructions, then send it:
 
    ```bash
-   .venv/bin/python -c "from backend.submission.level1_adapter import submit; print(submit(dry_run=False))"
+   .venv/bin/python -c "from backend.api.submission_adapter import submit; print(submit(dry_run=False))"
    ```
 
-If the token sits in `configs/submission.yaml`, do not commit the file. Prefer `token_env`.
+`configs/submission.yaml` is gitignored, but prefer `token_env` over putting a token in the file.
